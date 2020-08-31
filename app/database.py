@@ -1,7 +1,6 @@
 import psycopg2
 import os
 
-
 class Initialize_DB:
 
     @classmethod
@@ -13,11 +12,9 @@ class Initialize_DB:
         try:
             cls.connection = psycopg2.connect(db_url.SQLALCHEMY_DATABASE_URI)
             cls.cursor = cls.connection.cursor()
-            print(
-                f'A connection to {db_url.SQLALCHEMY_DATABASE_URI} database was established!')
+            print(f'A connection to {db_url.SQLALCHEMY_DATABASE_URI} database was established!')
         except:
-            print(
-                f'A problem occured while connecting to {db_url.SQLALCHEMY_DATABASE_URI}')
+            print(f'A problem occured while connecting to {db_url.SQLALCHEMY_DATABASE_URI}')
 
     @classmethod
     def create_tables(cls):
@@ -28,7 +25,6 @@ class Initialize_DB:
                 id serial PRIMARY KEY NOT NULL,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
-                othername TEXT NOT NULL,
                 email TEXT UNIQUE NOT NULL,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,

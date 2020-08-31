@@ -6,7 +6,6 @@ from flask_jwt_extended import (JWTManager)
 from instance.config import app_config
 from app.database import Initialize_DB
 
-
 def create_app(config_name):
     # func to initialize Flask app
 
@@ -30,11 +29,11 @@ def create_app(config_name):
     db.create_tables()
     db.connection.commit
 
-    @jwt.token_in_blacklist_loader
-    def check_blacklisted(token):
-        from app.api.v1.models.token_model import RevokedTokenModel
-        jti = token['jti']
-        return RevokedTokenModel().is_blacklisted(jti)
+    # @jwt.token_in_blacklist_loader
+    # def check_blacklisted(token):
+    #     from app.api.v1.models.token_model import RevokedTokenModel
+    #     jti = token['jti']
+    #     return RevokedTokenModel().is_blacklisted(jti)
 
     @app.route('/')
     @app.route('/index')

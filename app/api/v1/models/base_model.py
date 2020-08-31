@@ -3,13 +3,12 @@ This module performs all the database operations for the app
 """
 import os
 import jwt
-from datetime import datetime
+import datetime
 from functools import wraps, update_wrapper
 from flask import jsonify, request, session
 
 from app import create_app
 from app.database import Initialize_DB
-
 
 class BaseModel(Initialize_DB):
     # Base Model class for objects
@@ -75,7 +74,7 @@ class BaseModel(Initialize_DB):
     def grab_items_by_name(self, cols, condition, name=''):
         # fetches an item by name
         name = name if name else self.table_name
-
+      
         return self.fetch_one(
             "SELECT {} FROM {} WHERE {}".format(cols, name, condition)
         )
@@ -112,7 +111,6 @@ class BaseModel(Initialize_DB):
         return self.update(
             "UPDATE {} SET {} WHERE {}".format(name, updates, condition)
         )
-
 
 class AuthenticationRequired:
     # decorator class validates the token

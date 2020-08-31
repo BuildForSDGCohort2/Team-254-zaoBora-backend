@@ -167,4 +167,56 @@ def del_account(userId):
         return make_response(jsonify({
             "message": f"user with id '{userId}' deleted successfully",
             "status": 200
-        }), 200)             
+        }), 200)
+
+# endpoint allows a user to update their account
+@v1.route("/profile/<int:userId>", methods=['PUT', 'GET'])
+@AuthenticationRequired
+def update_account(userId):
+    auth_token = request.headers.get('Authorization')
+    token = auth_token.split(" ")[1]
+
+    if request.method == 'PUT':
+        data = request.get_json()
+        if UserValidator().signup_fields(data):
+            return make_response(jsonify(UserValidator().signup_fields(data)), 400)
+        else:
+            # Validate user
+            validate_user = UserValidator(data)
+            validation_methods = [
+                validate_user.valid_email,
+                validate_user.valid_name,
+                validate_user.validate_password,
+                validate_user.matching_password
+            ]
+
+            for error in validation_methods:
+                if error():
+                    return make_response(jsonify({
+                        "error": error()
+                    }), 422)
+                    
+        user_data = {
+            "first_name": data['first_name'],
+            "last_name": data['last_name'],
+            "email": data['email'],
+            "username": data['username'],
+            "password": data['password'],
+        }    
+
+        update_user = User().update_user(userId, user_data)
+        
+        if isinstance(update_user, dict):
+            print('==>>', update_user)
+            return make_response(jsonify(update_user), update_user['status'])
+        elif User().blacklisted(token):
+            return make_response(jsonify({
+                "error": "Please log in first!"
+            }), 400)
+        else:
+            return make_response(jsonify({
+                "message": f"user {user_data['email']} updated successfully",
+                "status": 200
+            }), 200) 
+        # get updated user data
+    

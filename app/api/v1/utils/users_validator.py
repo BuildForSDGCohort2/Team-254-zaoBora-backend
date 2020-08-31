@@ -7,7 +7,7 @@ class UserValidator:
     def __init__(self, data={}):
         self.data = data
 
-    # Helper methods
+    # helper methods for error handling
     def errorHandler(self, error_name):
         errors = {
             "first_name": "Your first name should be between 4 to 24 characters long!",
@@ -33,7 +33,7 @@ class UserValidator:
                     "status": 400
                 }
 
-    # Validator methods
+    # validator methods
     def signup_fields(self, data):
 
         fields = ['first_name', 'last_name', 'email',

@@ -71,23 +71,24 @@ If you have any more questions, please check out this resource  <https://www.you
 
 | Endpoint(URLs)              | Functionality       | HTTP Method |
 |-----------------------------|---------------------|-------------|
-| '/auth/register'            | Register a user     | POST        |
+| '/user'                     | Get all users       | GET         |
+| '/auth/signup'              | Register a new user | POST        |
 | '/auth/login'               | Login a user        | POST        |
 | '/auth/<int:userId>/logout' | Logout a user       | POST        |
 | '/profile/<int:userId>'     | Delete user account | DELETE      |
+| '/profile/<int:userId>'     | Update user account | PUT         |
 |                             |                     |             |
 |                             |                     |             |
-|-----------------------------------------------------------------|
 
 ### Authors
 
 #### Frontend
 
-David Macharia (<https://github.com/Dave-mash>)
-Alexander Thuo (<https://github.com/zanderthuo>)
-Margret Njeri (<https://github.com/Njeri-Marg>)
+1. David Macharia (<https://github.com/Dave-mash>)
+2. Alexander Thuo (<https://github.com/zanderthuo>)
+3. Margret Njeri (<https://github.com/Njeri-Marg>)
 
 #### Backend
 
-Derrick Moseti (<https://github.com/moseti1>)
-Jordan Muthemba (<https://github.com/Jordan-type>)
+1. Derrick Moseti (<https://github.com/moseti1>)
+2. Jordan Muthemba (<https://github.com/Jordan-type>)

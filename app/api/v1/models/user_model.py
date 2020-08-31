@@ -3,7 +3,6 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from .base_model import BaseModel, AuthenticationRequired
 
-
 class User(BaseModel):
     #  model class for user object
 
@@ -21,9 +20,9 @@ class User(BaseModel):
               self.is_admin = False
 
     def save_user(self):
-    # func to sve new user
+    # func to save new user
      user = dict(
-         first_name=self.fname,
+       first_name=self.fname,
        last_name=self.lname,
        email=self.email,
        username=self.username,
@@ -33,41 +32,43 @@ class User(BaseModel):
      keys = ", ".join(user.keys())
      values = tuple(user.values())
 
-     if self.fetch_specific_user('email', f"email = '{self.email}'"):
+     if self.fetch_specific_user('email', f"email = '{self.email}'", 'users'): 
+                            # print("{}".format(self.email))    
+                            #  f"email = '{self.email}'"):
           return {
                "error": "This email already exists try logging In!",
              "status": 409
            }
-     elif self.fetch_specific_user('username', f"username = '{self.username}'"):
+     elif self.fetch_specific_user('username', f"username = '{self.username}'", 'users'):
           return {
                "error": "This Username is already Taken!",
              "status": 409
            }
      else:
-          return self.base_model.add_item(keys, values)
+          return self.base_model.add_item(keys, values, 'users')
 
     def fetch_user_id(self, username):
          # fetches a user by id
          try:
-            return self.fetch_specific_user('id', f"username = '{username}'")
+            return self.fetch_specific_user('id', f"username = '{username}'", 'users')
          except:
             return False
 
     def fetch_all_users(self):
         # fetches all users
 
-        return self.base_model.grab_all_items('(username, email)', f"True = True")
+        return self.base_model.grab_all_items('(username, email)', f"True = True", 'users')
 
-    def fetch_specific_user(self, cols, condition):
+    def fetch_specific_user(self, cols, condition, name):
          # fetches a single user
 
-        return self.base_model.grab_items_by_name(cols, condition)
+        return self.base_model.grab_items_by_name(cols, condition, name)
 
     def log_in_user(self, details):
          # logs in a user
 
-        user = self.fetch_specific_user('email', f"email = '{details['email']}'")
-        password = self.fetch_specific_user('password', f"email = '{details['email']}'")
+        user = self.fetch_specific_user('email', f"email = '{details['email']}'", 'users')
+        password = self.fetch_specific_user('password', f"email = '{details['email']}'", 'users')
 
         if not user:
             return {
@@ -80,12 +81,12 @@ class User(BaseModel):
                 "status": 403
             }
         else:
-            return self.base_model.grab_items('(id, username)', f"email = '{details['email']}'")[0]
+            return self.base_model.grab_items('(id, username)', f"email = '{details['email']}'", 'users')[0]
 
     def log_out_user(self, id):
          # logs out a user
 
-        user = self.fetch_specific_user('username', f"id = '{id}'")
+        user = self.fetch_specific_user('username', f"id = '{id}'", 'users')
 
         if user:
             return user[0]
@@ -95,8 +96,8 @@ class User(BaseModel):
     def delete_user(self, id):
          # defines the delete query
 
-        if self.fetch_specific_user('id', f"id = {id}"):
-               return self.base_model.delete_item(f"id = {id}")
+        if self.fetch_specific_user('id', f"id = {id}", 'users'):
+               return self.base_model.delete_item(f"id = {id}", 'users')
         else:
             return {
                 "error": "User not found or does not exist!"
@@ -115,14 +116,14 @@ class User(BaseModel):
         
         pairs = ", ".join(pairs_dict.values())
         
-        if self.fetch_specific_user('username', f"username = '{updates['username']}'"):
+        if self.fetch_specific_user('username', f"username = '{updates['username']}'", 'users'):
             return {
                 "error": "This username is already taken!",
                 "status": 409
             }
 
-        if self.fetch_specific_user('id', f"id = {id}"):
-            return self.base_model.update_item(pairs, f"id = {id}")
+        if self.fetch_specific_user('id', f"id = {id}", 'users'):
+            return self.base_model.update_item(pairs, f"id = {id}", 'users')
         else:
             return {
                 "error": "User not found or does not exist!",
