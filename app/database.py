@@ -32,7 +32,7 @@ class Initialize_DB:
                 modified_on TIMESTAMP DEFAULT current_timestamp 
             );
             
-             CREATE TABLE IF NOT EXISTS blacklist(
+            CREATE TABLE IF NOT EXISTS blacklist(
                 id serial PRIMARY KEY NOT NULL,
                 username VARCHAR REFERENCES users(username)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
