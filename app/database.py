@@ -32,13 +32,50 @@ class Initialize_DB:
                 modified_on TIMESTAMP DEFAULT current_timestamp 
             );
             
-             CREATE TABLE IF NOT EXISTS blacklist(
+            CREATE TABLE IF NOT EXISTS products (
+                id serial PRIMARY KEY NOT NULL,
+                farmer_id INT REFERENCES users(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                product_name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                quantity INTEGER NOT NULL,
+                regular_price INTEGER NOT NULL,
+                discounted_price INTEGER NOT NULL,
+                product_rating INTEGER NULL,
+                product_review TEXT NULL,
+                created_on TIMESTAMP DEFAULT current_timestamp   
+            );
+            
+            CREATE TABLE IF NOT EXISTS categories (
+                id serial PRIMARY KEY NOT NULL,
+                category_name TEXT NOT NULL,
+                category_description TEXT NOT NULL   
+            );
+            
+            CREATE TABLE IF NOT EXISTS orders (
+                id serial PRIMARY KEY NOT NULL,
+                order_date TIMESTAMP DEFAULT current_timestamp,
+                total_price INTEGER NOT NULL,
+                buyer_id INT REFERENCES users(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE
+            );
+            
+            CREATE TABLE IF NOT EXISTS cart (
+                id serial PRIMARY KEY NOT NULL,
+                buyer_id INT REFERENCES users(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                productid INT REFERENCES products(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                quantity INTEGER NOT NULL                                   
+                );
+                              
+            CREATE TABLE IF NOT EXISTS blacklist(
                 id serial PRIMARY KEY NOT NULL,
                 username VARCHAR REFERENCES users(username)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 tokens VARCHAR NOT NULL
             );
-            
+                         
             """
         )
 

@@ -20,8 +20,10 @@ def create_app(config_name):
 
     # v1 Blueprints
     from app.api.v1.views.user_view import v1 as user_v1
+    from app.api.v1.views.product_view import v1 as product_v1
 
     app.register_blueprint(user_v1)
+    app.register_blueprint(product_v1)
 
     # init db
     db = Initialize_DB(app_config[config_name])
