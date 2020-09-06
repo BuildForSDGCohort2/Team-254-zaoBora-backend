@@ -219,4 +219,3 @@ def update_account(userId):
                 "status": 200
             }), 200) 
         # get updated user data
-    
