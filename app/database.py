@@ -88,8 +88,7 @@ class Initialize_DB:
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 tokens VARCHAR NOT NULL
             );
-                
-                                    
+                                       
             """
         )
 

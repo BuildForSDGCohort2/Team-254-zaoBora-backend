@@ -17,27 +17,38 @@ Zao Bora is an online platform where people can register and be a part of a comm
 
 ### Setting up
 
+================================
+
 Step 1: Click on Fork at the top right corner
 
 Step 3: cd into the cloned folder | cd Team-254-zaoBora-backend
 
-Step 4: git remote add upstream <https://github.com/http://127.0.0.1:5000/>
+Step 4: ` git remote add upstream <https://github.com/http://127.0.0.1:5000/> `
 
-Step 5: git pull upstream develop
+Step 5: ` git pull upstream develop `
 
-Step 6: Check out to the task branch | git checkout -b <NAME_OF_THE_TASK>
+Step 6: Check out to the task branch | ` git checkout -b <NAME_OF_THE_TASK> `
 
 e.g git checkout -b develop/ft-authentication-endpoints
 
 #### Running the project locally
 
-Step 1: cd to the cloned folder on termimal type py -m venv env or python -m venv env to install the virtual enviroment
+================================
 
-Step 2: Install pip install -r requirements
+Step 1: cd to the cloned folder on termimal type ` py -m venv env ` or `python -m venv env` to install the virtual enviroment
+
+Step 2: Install ` pip install -r requirements.txt `
 
 Step 3: Setup a PostgreSQL Database on config.py
 
-Step 4: Run python -m flask run to test your database connection
+    - [x] Download PostgreSQL(pgAdmin4) <https://www.pgadmin.org/download>
+    - [x] Setup username(postgres) and password(******) equivalent to root in Mysql 
+    - [x] Open PostgreSQL on broswer and create a database named zaobora_database
+    - [x] Open config.py in folder instance under develpoment change the line
+
+`postgresql://postgres:password@127.0.0.1:5432/zaobora_database`
+
+Step 4: Run ` python -m flask run ` or ` py -m flask run ` to test your database connection
 
 Step 4: Go to <http://localhost:5000> or <http://127.0.0.1:5000>
 
@@ -47,13 +58,13 @@ Run git branch It should show that you are on your current branch
 
 After implementing your task
 
-Step 1: Run: git add .
+Step 1: Run: ` git add . `
 
-Step 2: Run: git commit -m "< COMMIT MESSAGE >"
+Step 2: Run: ` git commit -m "< COMMIT MESSAGE >" `
 
-Step 3: git pull upstream develop
+Step 3: ` git pull upstream develop `
 
-Step 4: git push origin < BRANCH_NAME >
+Step 4: ` git push origin < BRANCH_NAME > `
 
 Go to the repository <https://github.com/BuildForSDGCohort2/Team-254-zaoBora-backend>
 
