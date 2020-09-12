@@ -53,7 +53,7 @@ class BaseModel(Initialize_DB):
     def decode_auth_token(cls, auth_token):
         # takes in token and decodes it
 
-        app = create_app()
+        app = create_app(cls.env)
 
         try:
             payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))

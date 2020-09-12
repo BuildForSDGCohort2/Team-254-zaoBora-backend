@@ -21,21 +21,17 @@ def create_app(config_name):
     # v1 Blueprints
     from app.api.v1.views.user_view import v1 as user_v1
     from app.api.v1.views.product_view import v1 as product_v1
+    from app.api.v1.views.vendor_view import v1 as vendor_v1
 
     app.register_blueprint(user_v1)
     app.register_blueprint(product_v1)
+    app.register_blueprint(vendor_v1)
 
     # init db
     db = Initialize_DB(app_config[config_name])
     db.init_db(app_config[config_name])
     db.create_tables()
     db.connection.commit
-
-    # @jwt.token_in_blacklist_loader
-    # def check_blacklisted(token):
-    #     from app.api.v1.models.token_model import RevokedTokenModel
-    #     jti = token['jti']
-    #     return RevokedTokenModel().is_blacklisted(jti)
 
     @app.route('/')
     @app.route('/index')
