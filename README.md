@@ -80,16 +80,27 @@ If you have any more questions, please check out this resource  <https://www.you
 
 ### ZaoBora application endpoints
 
-| Endpoint(URLs)              | Functionality       | HTTP Method |
-|-----------------------------|---------------------|-------------|
-| '/user'                     | Get all users       | GET         |
-| '/auth/signup'              | Register a new user | POST        |
-| '/auth/login'               | Login a user        | POST        |
-| '/auth/<int:userId>/logout' | Logout a user       | POST        |
-| '/profile/<int:userId>'     | Delete user account | DELETE      |
-| '/profile/<int:userId>'     | Update user account | PUT         |
-|                             |                     |             |
-|                             |                     |             |
+| Endpoint(URLs)                             | Functionality         | HTTP Method    |
+|--------------------------------------------|-----------------------|----------------|
+| '/users'                                   | Get all users         | GET            |
+| '/auth/signup'                             | Register a new user   | POST           |
+| '/auth/login'                              | Login a user          | POST           |
+| '/auth/<int:userId>/logout'                | Logout a user         | POST           |
+| '/profile/<int:userId>'                    | Delete user account   | DELETE         |
+| '/profile/<int:userId>'                    | Update user account   | PUT            |
+|--------------------------------------------|-----------------------|----------------|
+| '/vendors'                                 | Get all vendors       | GET            |
+| '/auth/vendor/signup'                      | Register a new vendor | POST           |
+| '/auth/vendor/login'                       | Login a vendor        | POST           |
+| '/auth/vendor/<int:vendorId>/logout'       | Logout a vendor       | POST           |
+| '/profile/vendor/<int:vendorId>'           | Update vendor account | PUT            |
+|--------------------------------------------|-----------------------|----------------|
+| '/products'                                | Get all products      | GET            |
+| '/<int:vendorId>/product'                  | Create a new product  | POST           |
+| '/products/<int:productId>'                 | Get a single product  | GET            |
+| '/<int:vendorId>/product/<int:productId>'  | Update a product      | GET            |
+| '/<int:vendorId>/product/<int:productId>'  | Delete a product      | DELETE         |
+|                                            |                       |                |
 
 ### Authors
 

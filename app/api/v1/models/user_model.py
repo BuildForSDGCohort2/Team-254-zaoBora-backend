@@ -32,9 +32,7 @@ class User(BaseModel):
      keys = ", ".join(user.keys())
      values = tuple(user.values())
 
-     if self.fetch_specific_user('email', f"email = '{self.email}'", 'users'): 
-                            # print("{}".format(self.email))    
-                            #  f"email = '{self.email}'"):
+     if self.fetch_specific_user('email', f"email = '{self.email}'", 'users'):
           return {
                "error": "This email already exists try logging In!",
              "status": 409
