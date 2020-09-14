@@ -5,7 +5,7 @@ class Initialize_DB:
 
     @classmethod
     def __init__(cls, db_url):
-        cls.env = db_url.ENV
+        cls.env = db_url.env
 
     @classmethod
     def init_db(cls, db_url):

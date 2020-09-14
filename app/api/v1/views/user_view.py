@@ -7,6 +7,7 @@ from flask import jsonify, request, abort, make_response, json, Blueprint
 
 from ..models.user_model import User, AuthenticationRequired
 from ..utils.users_validator import UserValidator
+from ..utils import transact_mpesa
 
 v1 = Blueprint('userv1', __name__, url_prefix='/api/v1')
 
@@ -219,4 +220,8 @@ def update_account(userId):
                 "status": 200
             }), 200) 
         # get updated user data
-    
+
+@v1.route("/lipa_mpesa")
+def lipa():
+    pay_online = transact_mpesa.lipa_na_mpesa()
+    return pay_online
