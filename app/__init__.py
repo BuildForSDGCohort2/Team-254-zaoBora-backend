@@ -12,6 +12,7 @@ from flask_mpesa import MpesaAPI
 
 
 
+
 def create_app(config_name):
     # func to initialize Flask app
 
