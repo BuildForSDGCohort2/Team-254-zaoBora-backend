@@ -2,7 +2,7 @@ import re
 import string
 from datetime import datetime
 
-class UserValidator:
+class VendorValidator:
 
     def __init__(self, data={}):
         self.data = data
@@ -82,7 +82,7 @@ class UserValidator:
     def matching_password(self):
         if str(self.data['password']) != str(self.data['confirm_password']):
             return self.errorHandler('unmatching_pass')
-    
+        
     def valid_phone_number(self):
         reg_num = re.compile(r"^[-+]?[0-9]+$")
 

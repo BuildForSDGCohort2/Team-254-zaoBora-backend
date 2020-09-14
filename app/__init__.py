@@ -28,10 +28,14 @@ def create_app(config_name):
 
     # v1 Blueprints
     from app.api.v1.views.user_view import v1 as user_v1
+    from app.api.v1.views.product_view import v1 as product_v1
+    from app.api.v1.views.vendor_view import v1 as vendor_v1
 
     app.register_blueprint(user_v1)
     # instantiate mpesa
     mpesaapi= MpesaAPI()
+    app.register_blueprint(product_v1)
+    app.register_blueprint(vendor_v1)
 
     #init mpesa api on app
     mpesaapi.init_app(app)
@@ -40,12 +44,6 @@ def create_app(config_name):
     #db.init_db(app)
     #db.create_tables()
     #db.connection.commit
-
-    # @jwt.token_in_blacklist_loader
-    # def check_blacklisted(token):
-    #     from app.api.v1.models.token_model import RevokedTokenModel
-    #     jti = token['jti']
-    #     return RevokedTokenModel().is_blacklisted(jti)
 
     @app.route('/')
     @app.route('/index')

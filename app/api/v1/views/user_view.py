@@ -59,9 +59,9 @@ def registration():
         "username": data['username'],
         "password": data['password']
     }
-
+    
     reg_user = User(user_data)
-
+    
     if reg_user.save_user():
         return make_response(jsonify(reg_user.save_user()), 409)
     else:

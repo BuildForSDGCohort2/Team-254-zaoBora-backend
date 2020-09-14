@@ -32,13 +32,63 @@ class Initialize_DB:
                 modified_on TIMESTAMP DEFAULT current_timestamp 
             );
             
+            CREATE TABLE IF NOT EXISTS vendors (
+                id serial PRIMARY KEY NOT NULL,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                registered_on TIMESTAMP DEFAULT current_timestamp,
+                modified_on TIMESTAMP DEFAULT current_timestamp 
+            );
+            
+            CREATE TABLE IF NOT EXISTS products (
+                id serial PRIMARY KEY NOT NULL,
+                vendor_id INT REFERENCES vendors(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                product_name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                quantity INTEGER NOT NULL,
+                regular_price INTEGER NOT NULL,
+                discounted_price INTEGER NOT NULL,
+                product_rating INTEGER NOT NULL,
+                product_review TEXT NOT NULL,
+                created_on TIMESTAMP DEFAULT current_timestamp   
+            );
+            
+            CREATE TABLE IF NOT EXISTS categories (
+                id serial PRIMARY KEY NOT NULL,
+                category_name TEXT NOT NULL,
+                category_description TEXT NOT NULL   
+            );
+            
+            CREATE TABLE IF NOT EXISTS orders (
+                id serial PRIMARY KEY NOT NULL,
+                order_date TIMESTAMP DEFAULT current_timestamp,
+                total_price INTEGER NOT NULL,
+                order_status INTEGER NULL,
+                tracking_number TEXT NOT NULL,
+                buyer_id INT REFERENCES users(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE
+            );
+            
+            CREATE TABLE IF NOT EXISTS cart (
+                id serial PRIMARY KEY NOT NULL,
+                buyer_id INT REFERENCES users(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                productid INT REFERENCES products(id)\
+                ON UPDATE CASCADE ON DELETE CASCADE,
+                quantity INTEGER NOT NULL                                   
+            );
+            
             CREATE TABLE IF NOT EXISTS blacklist(
                 id serial PRIMARY KEY NOT NULL,
-                username VARCHAR REFERENCES users(username)\
+                username VARCHAR REFERENCES vendors(username)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 tokens VARCHAR NOT NULL
             );
-            
+                                       
             """
         )
 
@@ -47,8 +97,7 @@ class Initialize_DB:
     @classmethod
     def execute(cls, query):
         # saves values into the db
-
-        print(query)
+        
         cls.cursor.execute(query)
         cls.connection.commit()
 
@@ -77,5 +126,5 @@ class Initialize_DB:
     def drop_tables(cls):
         # drops all tables
 
-        cls.cursor.excute("DROP TABLE IF EXISTS users CASCADE;")
+        cls.cursor.excute("DROP TABLE IF EXISTS users, products CASCADE;")
         cls.connection.commit()
