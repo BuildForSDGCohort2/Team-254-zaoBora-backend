@@ -19,7 +19,13 @@ def get():
     users_list = []
 
     for user in users:
-        users_list.append(user[0])
+        parsed_user = eval(users[0][0])
+        user_item = {
+            "username": parsed_user[0].strip(),
+            "email": parsed_user[1].strip()
+        }
+
+        users_list.append(user_item)
 
     return make_response(jsonify({
         "status": 200,
@@ -41,7 +47,9 @@ def registration():
         validate_user.valid_email,
         validate_user.valid_name,
         validate_user.validate_password,
-        validate_user.matching_password
+        validate_user.matching_password,
+    	validate_user.valid_phone_number,
+    	validate_user.valid_farmer_bool
     ]
 
     for error in validation_methods:
@@ -57,22 +65,25 @@ def registration():
         "last_name": data['last_name'],
         "email": data['email'],
         "username": data['username'],
+        "phone_number": data['phone_number'],
+        "is_farmer": data['is_farmer'],
         "password": data['password']
     }
     
     reg_user = User(user_data)
-    
+
     if reg_user.save_user():
         return make_response(jsonify(reg_user.save_user()), 409)
     else:
         id = reg_user.fetch_user_id(user_data['username'])
         auth_token = reg_user.encode_auth_token(id[0])
+        
         return make_response(jsonify({
             "status": 201,
             "message": "{} registered successfully".format(data['email']),
             "username": data['username'],
             "auth_token": auth_token.decode('utf-8')
-        }), 201)        
+        }), 201)
             
 # endpoint to login/signin user # allows registered users to login
 @v1.route("/auth/login", methods=['POST'])

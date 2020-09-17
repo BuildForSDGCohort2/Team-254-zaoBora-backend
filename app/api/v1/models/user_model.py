@@ -16,40 +16,43 @@ class User(BaseModel):
               self.lname = user['last_name']
               self.email = user['email']
               self.username = user['username']
+              self.is_farmer = user['is_farmer']
+              self.phone_number = user['phone_number']
               self.password = generate_password_hash(user['password'])
-              self.is_admin = False
 
     def save_user(self):
     # func to save new user
-     user = dict(
-       first_name=self.fname,
-       last_name=self.lname,
-       email=self.email,
-       username=self.username,
-       password=self.password
-     )
+        user = dict(
+            first_name=self.fname,
+            last_name=self.lname,
+            email=self.email,
+            is_farmer=self.is_farmer,
+            phone_number=self.phone_number,
+            username=self.username,
+            password=self.password
+        )
 
-     keys = ", ".join(user.keys())
-     values = tuple(user.values())
+        keys = ", ".join(user.keys())
+        values = tuple(user.values())
 
-     if self.fetch_specific_user('email', f"email = '{self.email}'", 'users'):
-          return {
-               "error": "This email already exists try logging In!",
-             "status": 409
-           }
-     elif self.fetch_specific_user('username', f"username = '{self.username}'", 'users'):
-          return {
-               "error": "This Username is already Taken!",
-             "status": 409
-           }
-     else:
-          return self.base_model.add_item(keys, values, 'users')
+        if self.fetch_specific_user('email', f"email = '{self.email}'", 'users'):
+            return {
+                "error": "This email already exists try logging In!",
+                "status": 409
+            }
+        elif self.fetch_specific_user('username', f"username = '{self.username}'", 'users'):
+            return {
+                "error": "This Username is already Taken!",
+                "status": 409
+            }
+        else:
+            return self.base_model.add_item(keys, values, 'users')
 
     def fetch_user_id(self, username):
-         # fetches a user by id
-         try:
+        # fetches a user by id
+        try:
             return self.fetch_specific_user('id', f"username = '{username}'", 'users')
-         except:
+        except:
             return False
 
     def fetch_all_users(self):
@@ -58,7 +61,7 @@ class User(BaseModel):
         return self.base_model.grab_all_items('(username, email)', f"True = True", 'users')
 
     def fetch_specific_user(self, cols, condition, name):
-         # fetches a single user
+        # fetches a single user
 
         return self.base_model.grab_items_by_name(cols, condition, name)
 

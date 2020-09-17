@@ -25,21 +25,24 @@ class Initialize_DB:
             """
             CREATE TABLE IF NOT EXISTS users (
                 id serial PRIMARY KEY NOT NULL,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                username TEXT UNIQUE NOT NULL,
+                first_name CHAR(100) NOT NULL,
+                last_name CHAR(100) NOT NULL,
+                email CHAR(100) UNIQUE NOT NULL,
+                username CHAR(100) UNIQUE NOT NULL,
+                phone_number CHAR(100) NOT NULL,
                 password TEXT NOT NULL,
+                is_farmer BOOLEAN NOT NULL,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 modified_on TIMESTAMP DEFAULT current_timestamp
             );
 
             CREATE TABLE IF NOT EXISTS vendors (
                 id serial PRIMARY KEY NOT NULL,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                username TEXT UNIQUE NOT NULL,
+                first_name CHAR(100) NOT NULL,
+                last_name CHAR(100) NOT NULL,
+                email CHAR(100) UNIQUE NOT NULL,
+                username CHAR(100) UNIQUE NOT NULL,
+                phone_number CHAR(100) NOT NULL,
                 password TEXT NOT NULL,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 modified_on TIMESTAMP DEFAULT current_timestamp
