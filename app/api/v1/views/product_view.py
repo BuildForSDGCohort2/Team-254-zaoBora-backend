@@ -5,7 +5,7 @@ import json
 from flask import request, jsonify, make_response, Blueprint
 
 from ..models.product_model import Product, AuthenticationRequired
-from ..models.vendor_model import Vendor, AuthenticationRequired
+# from ..models.vendor_model import Vendor, AuthenticationRequired
 
 v1 = Blueprint('productv1', __name__, url_prefix='/api/v1')
 

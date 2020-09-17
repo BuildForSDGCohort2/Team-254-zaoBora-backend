@@ -5,7 +5,7 @@ import re
 import json 
 from flask import jsonify, request, abort, make_response, json, Blueprint
 
-from ..models.vendor_model import Vendor, AuthenticationRequired
+# from ..models.vendor_model import Vendor, AuthenticationRequired
 from ..utils.vendors_validator import VendorValidator
 
 v1 = Blueprint('vendorv1', __name__, url_prefix='/api/v1')
@@ -116,7 +116,7 @@ def login():
 
 # endpoint allows registered vendors to logout
 @v1.route("/auth/vendor/<int:vendorId>/logout", methods=['POST'])
-@AuthenticationRequired
+# @AuthenticationRequired
 def logout(vendorId):
     auth_token = request.headers.get('Authorization')
     token = auth_token.split(" ")[1]
@@ -153,7 +153,7 @@ def logout(vendorId):
 
 # endpoint allows a vendor to update their account
 @v1.route("/profile/vendor/<int:vendorId>", methods=['PUT', 'GET'])
-@AuthenticationRequired
+# @AuthenticationRequiredc
 def update_account(vendorId):
     auth_token = request.headers.get('Authorization')
     token = auth_token.split(" ")[1]
