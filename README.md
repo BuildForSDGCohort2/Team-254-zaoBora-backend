@@ -12,6 +12,7 @@ Zao Bora is an online platform where people can register and be a part of a comm
 * Git
 * Postmam
 * PostgreSQL
+* python3-venv
 
 ## Getting Started
 
@@ -31,26 +32,87 @@ Step 6: Check out to the task branch | ` git checkout -b <NAME_OF_THE_TASK> `
 
 e.g git checkout -b develop/ft-authentication-endpoints
 
-#### Running the project locally
+#### Running the project locally (Linux)
 
 ================================
 
-Step 1: cd to the cloned folder on termimal type ` py -m venv env ` or `python -m venv env` to install the virtual enviroment
+1. Clone repo
+```
+$ git clone https://github.com/BuildForSDGCohort2/Team-254-zaoBora-backend.git
+```
 
-Step 2: Install ` pip install -r requirements.txt `
+2. On your terminal, install python3-venv (skip this step if you already have python3-venv)
+```
+$ sudo apt-get install python3-venv
+```
 
-Step 3: Setup a PostgreSQL Database on config.py
+3. Cd into project directory and create virtual environment
+```
+$ python -m pip install --upgrade pip
+$ cd Team-254-zaoBora-backend
+$ python -m venv env
+```
 
-    - [x] Download PostgreSQL(pgAdmin4) <https://www.pgadmin.org/download>
-    - [x] Setup username(postgres) and password(******) equivalent to root in Mysql 
-    - [x] Open PostgreSQL on broswer and create a database named zaobora_database
-    - [x] Open config.py in folder instance under develpoment change the line
+4. Set the environment variables
+- Create an instance folder in the root of the project, inside create a `__init__.py` and a `config.py` and copy these contents -> [Contents](https://gist.github.com/Dave-mash/c0853979343257db52dd251ed4c54219) into `config.py`
+```
+$ mv .env.example .env
+$ source env/bin/activate
+$ source .env
+```
 
-`postgresql://postgres:password@127.0.0.1:5432/zaobora_database`
+5. Install
+```
+$ pip install -r requirements.txt
+$ pip freeze > requirements.txt
+```
 
-Step 4: Run ` python -m flask run ` or ` py -m flask run ` to test your database connection
+6. Run the app
+```
+$ python run.py
+```
+or
+```
+$ flask run
+```
 
-Step 4: Go to <http://localhost:5000> or <http://127.0.0.1:5000>
+#### Running the project locally (Windows)
+
+================================
+
+1. Clone repo
+```
+$ git clone https://github.com/BuildForSDGCohort2/Team-254-zaoBora-backend.git
+```
+
+2. Cd into project directory and create virtual environment
+```
+$ py -m pip install --upgrade pip
+$ cd Team-254-zaoBora-backend
+$ py -m venv env
+```
+
+4. Set the environment variables
+- Rename .env.example to .env
+- Create an instance folder in the root of the project, inside create a `__init__.py` and a `config.py` and copy these contents -> [Contents](https://gist.github.com/Dave-mash/c0853979343257db52dd251ed4c54219) into `config.py`
+```
+$ .\env\Scripts\activate
+```
+
+5. Install
+```
+$ pip install -r requirements.txt
+$ pip freeze > requirements.txt
+```
+
+6. Run the app
+```
+$ python run.py
+```
+or
+```
+$ flask run
+```
 
 #### Creating a pull request
 

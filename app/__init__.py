@@ -6,12 +6,7 @@ from flask_jwt_extended import (JWTManager)
 from instance.config import app_config
 from app.database import Initialize_DB
 from flask_mpesa import MpesaAPI
-
-
-
-
-
-
+from config.development import DEV_DATABASE_URI
 
 def create_app(config_name):
     # func to initialize Flask app
@@ -19,8 +14,20 @@ def create_app(config_name):
     # init app
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
-    #app.config.from_object(app_config[config_name])
+
+    # Load the default configuration
+    app.config.from_object('config.default')
+
+    # Load the development configuration
+    app.config.from_object('config.development')
+
+    # Load the configuration from the instance folder
     app.config.from_pyfile('config.py')
+
+    # Load configurations specified by the APP_CONFIG_FILE environment variable
+    # Variables contained here will override those in the default configuration
+    # export APP_CONFIG_FILE=/path/to/config/production.py
+    app.config.from_envvar('APP_CONFIG_FILE')
 
     # init JWT
     jwt = JWTManager()
@@ -41,9 +48,9 @@ def create_app(config_name):
     mpesaapi.init_app(app)
     # init db
     db = Initialize_DB(app)
-    #db.init_db(app)
-    #db.create_tables()
-    #db.connection.commit
+    db.init_db(DEV_DATABASE_URI)
+    db.create_tables()
+    db.connection.commit
 
     @app.route('/')
     @app.route('/index')
