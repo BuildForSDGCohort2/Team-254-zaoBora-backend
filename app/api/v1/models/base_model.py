@@ -39,10 +39,6 @@ class BaseModel(Initialize_DB):
         except Exception as e:
             return e
 
-    def blacklisted(self, details):
-        # black lists tokens
-        self.add_item('username, tokens', details, 'blacklist')
-
     def blacklisted(self, token):
         # checks whether a token blacklisted
         query = "SELECT id FROM blacklist WHERE tokens = '{}';".format(token)
@@ -74,7 +70,7 @@ class BaseModel(Initialize_DB):
     def grab_items_by_name(self, cols, condition, name=''):
         # fetches an item by name
         name = name if name else self.table_name
-      
+
         return self.fetch_one(
             "SELECT {} FROM {} WHERE {}".format(cols, name, condition)
         )
@@ -111,6 +107,7 @@ class BaseModel(Initialize_DB):
         return self.update(
             "UPDATE {} SET {} WHERE {}".format(name, updates, condition)
         )
+
 
 class AuthenticationRequired:
     # decorator class validates the token

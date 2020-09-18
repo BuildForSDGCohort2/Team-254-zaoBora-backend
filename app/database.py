@@ -11,12 +11,10 @@ class Initialize_DB:
     def init_db(cls, db_url):
         try:
             cls.connection = psycopg2.connect(db_url)
-            # cls.connection = psycopg2.connect('postgresql://postgres:password@127.0.0.1:5432/zaobora_database')
             cls.cursor = cls.connection.cursor()
             print(f'A connection to {db_url} database was established!')
         except:
             print(f'A problem occured while connecting to {db_url}')
-            # print('A problem occured while connecting to postgresql://postgres:password@127.0.0.1:5432/zaobora_database')
 
     @classmethod
     def create_tables(cls):

@@ -53,12 +53,13 @@ $ cd Team-254-zaoBora-backend
 $ python -m venv env
 ```
 
-4. Set the environment variables
+4. Set the environment variables and create db
 - Create an instance folder in the root of the project, inside create a `__init__.py` and a `config.py` and copy these contents -> [Contents](https://gist.github.com/Dave-mash/c0853979343257db52dd251ed4c54219) into `config.py`
 ```
 $ mv .env.example .env
 $ source env/bin/activate
 $ source .env
+$ createdb zaobora_database
 ```
 
 5. Install
@@ -70,10 +71,6 @@ $ pip freeze > requirements.txt
 6. Run the app
 ```
 $ python run.py
-```
-or
-```
-$ flask run
 ```
 
 #### Running the project locally (Windows)
@@ -92,11 +89,15 @@ $ cd Team-254-zaoBora-backend
 $ py -m venv env
 ```
 
-4. Set the environment variables
+4. Set the environment variables and create db
 - Rename .env.example to .env
 - Create an instance folder in the root of the project, inside create a `__init__.py` and a `config.py` and copy these contents -> [Contents](https://gist.github.com/Dave-mash/c0853979343257db52dd251ed4c54219) into `config.py`
 ```
 $ .\env\Scripts\activate
+```
+- Login to postgres shell and run:
+```
+$ CREATE DATABASE zaobora_database;
 ```
 
 5. Install
@@ -108,10 +109,6 @@ $ pip freeze > requirements.txt
 6. Run the app
 ```
 $ python run.py
-```
-or
-```
-$ flask run
 ```
 
 #### Creating a pull request
