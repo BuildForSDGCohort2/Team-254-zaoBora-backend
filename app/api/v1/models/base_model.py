@@ -9,6 +9,8 @@ from flask import jsonify, request, session
 
 from app import create_app
 from app.database import Initialize_DB
+from config.development import DEV_SECRET_KEY
+
 
 class BaseModel(Initialize_DB):
     # Base Model class for objects
@@ -21,7 +23,7 @@ class BaseModel(Initialize_DB):
     def encode_auth_token(cls, user_id):
         # generates authentication token
 
-        app = create_app(cls.env)
+        # app = create_app(cls.env)
 
         try:
             payload = {
@@ -31,15 +33,11 @@ class BaseModel(Initialize_DB):
             }
             return jwt.encode(
                 payload,
-                app.config.get('SECRET_KEY'),
+                DEV_SECRET_KEY,
                 algorithm='HS256'
             )
         except Exception as e:
             return e
-
-    def blacklisted(self, details):
-        # black lists tokens
-        self.add_item('username, tokens', details, 'blacklist')
 
     def blacklisted(self, token):
         # checks whether a token blacklisted
@@ -53,10 +51,8 @@ class BaseModel(Initialize_DB):
     def decode_auth_token(cls, auth_token):
         # takes in token and decodes it
 
-        app = create_app(cls.env)
-
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(auth_token, DEV_SECRET_KEY)
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again!'
@@ -74,7 +70,7 @@ class BaseModel(Initialize_DB):
     def grab_items_by_name(self, cols, condition, name=''):
         # fetches an item by name
         name = name if name else self.table_name
-      
+
         return self.fetch_one(
             "SELECT {} FROM {} WHERE {}".format(cols, name, condition)
         )
@@ -111,6 +107,7 @@ class BaseModel(Initialize_DB):
         return self.update(
             "UPDATE {} SET {} WHERE {}".format(name, updates, condition)
         )
+
 
 class AuthenticationRequired:
     # decorator class validates the token

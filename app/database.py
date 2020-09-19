@@ -11,12 +11,10 @@ class Initialize_DB:
     def init_db(cls, db_url):
         try:
             cls.connection = psycopg2.connect(db_url)
-            # cls.connection = psycopg2.connect('postgresql://postgres:password@127.0.0.1:5432/zaobora_database')
             cls.cursor = cls.connection.cursor()
             print(f'A connection to {db_url} database was established!')
         except:
             print(f'A problem occured while connecting to {db_url}')
-            # print('A problem occured while connecting to postgresql://postgres:password@127.0.0.1:5432/zaobora_database')
 
     @classmethod
     def create_tables(cls):
@@ -25,21 +23,24 @@ class Initialize_DB:
             """
             CREATE TABLE IF NOT EXISTS users (
                 id serial PRIMARY KEY NOT NULL,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                username TEXT UNIQUE NOT NULL,
+                first_name CHAR(100) NOT NULL,
+                last_name CHAR(100) NOT NULL,
+                email CHAR(100) UNIQUE NOT NULL,
+                username CHAR(100) UNIQUE NOT NULL,
+                phone_number CHAR(100) NOT NULL,
                 password TEXT NOT NULL,
+                is_farmer BOOLEAN NOT NULL,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 modified_on TIMESTAMP DEFAULT current_timestamp
             );
 
             CREATE TABLE IF NOT EXISTS vendors (
                 id serial PRIMARY KEY NOT NULL,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                username TEXT UNIQUE NOT NULL,
+                first_name CHAR(100) NOT NULL,
+                last_name CHAR(100) NOT NULL,
+                email CHAR(100) UNIQUE NOT NULL,
+                username CHAR(100) UNIQUE NOT NULL,
+                phone_number CHAR(100) NOT NULL,
                 password TEXT NOT NULL,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 modified_on TIMESTAMP DEFAULT current_timestamp

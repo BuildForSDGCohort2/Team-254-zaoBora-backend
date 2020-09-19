@@ -1,6 +1,8 @@
 import re
 import string
 from datetime import datetime
+import phonenumbers
+# from phonenumbers import carriers
 
 class UserValidator:
 
@@ -15,9 +17,10 @@ class UserValidator:
             "username": "Your username should be between 4 to 24 characters long!",
             "email": "Invalid email address!",
             "password": "Weak password!",
-            "phone_number": "Use valid numbers for phone number",
+            "phone_number": "Invalid phone number",
             "unmatching_pass": "Your passwords don't match!",
             "valid_fname": "please enter valid first name!",
+            "is_farmer": "is_farmer only accepts boolean values!",
             "valid_lname": "please enter valid last name!",
             "valid_username": "please enter valid username!"
         }
@@ -36,8 +39,7 @@ class UserValidator:
     # validator methods
     def signup_fields(self, data):
 
-        fields = ['first_name', 'last_name', 'email',
-                  'username', 'password', 'confirm_password']
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'is_farmer', 'username', 'password', 'confirm_password']
 
         return self.check_fields(data, fields)
 
@@ -84,7 +86,18 @@ class UserValidator:
             return self.errorHandler('unmatching_pass')
     
     def valid_phone_number(self):
-        reg_num = re.compile(r"^[-+]?[0-9]+$")
+        try:
+            input_number = self.data['phone_number']
+            len(input_number) <= 12
+            num = phonenumbers.parse(input_number, "KE")
+            phonenumbers.is_valid_number(num)
+        except:
+    	    return self.errorHandler('phone_number')
+    
+    def valid_farmer_bool(self):
+    	try:
+    	    (self.data['is_farmer'] == "True") or (self.data['is_farmer'] == "False")
+    	except:
+    	    return self.errorHandler('is_farmer')
 
-        if not re.match(reg_num, str(self.data['phone_number'])):
-            return self.errorHandler('phone_number')     
+
