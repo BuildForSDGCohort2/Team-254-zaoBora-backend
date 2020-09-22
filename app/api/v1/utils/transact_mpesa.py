@@ -62,5 +62,4 @@ def lipa_na_mpesa():
     response = requests.post(api_url, json = request, headers=headers)
     
     print (response.text)
-    
-lipa_na_mpesa()
+   
