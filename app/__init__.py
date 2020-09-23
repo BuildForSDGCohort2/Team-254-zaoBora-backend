@@ -4,7 +4,6 @@ from flask_cors import CORS
 from flask_jwt_extended import (JWTManager)
 from flask_redis import FlaskRedis
 
-from instance.config import app_config
 from app.database import Initialize_DB
 from flask_mpesa import MpesaAPI
 from config.development import DATABASE_URI
