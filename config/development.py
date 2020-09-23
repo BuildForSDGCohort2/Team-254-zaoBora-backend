@@ -2,7 +2,7 @@
 import os
 
 
-DEV_DATABASE_URI = os.getenv('DEV_DATABASE_URI')
+DEV_DATABASE_URI = os.getenv("postgres://postgres:none@127.0.0.1:5432/zaobora_database")
 DEV_SECRET_KEY = os.getenv('DEV_SECRET_KEY')
 DEV_SECURITY_PASSWORD_SALT = os.getenv('DEV_SECURITY_PASSWORD_SALT')
 DEV_MAIL_SERVER = os.getenv('DEV_MAIL_SERVER')
