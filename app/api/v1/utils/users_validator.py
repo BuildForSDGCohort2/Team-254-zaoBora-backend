@@ -4,6 +4,7 @@ from datetime import datetime
 import phonenumbers
 # from phonenumbers import carriers
 
+
 class UserValidator:
 
     def __init__(self, data={}):
@@ -22,7 +23,11 @@ class UserValidator:
             "valid_fname": "please enter valid first name!",
             "is_farmer": "is_farmer only accepts boolean values!",
             "valid_lname": "please enter valid last name!",
-            "valid_username": "please enter valid username!"
+            "valid_username": "please enter valid username!",
+            "region": "Please enter a valid region",
+            "city": "Please enter a valid city",
+            "address": "Please enter a valid address",
+            "street_address": "Please enter a valid street_address"
         }
         return errors[error_name]
 
@@ -39,7 +44,54 @@ class UserValidator:
     # validator methods
     def signup_fields(self, data):
 
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'is_farmer', 'username', 'password', 'confirm_password']
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'is_farmer',
+            'username',
+            'password',
+            'confirm_password',
+            'region',
+            'city',
+            'address',
+            'street_address'
+        ]
+
+        return self.check_fields(data, fields)
+
+    # validator methods
+    def vendor_signup_fields(self, data):
+
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'username',
+            'password',
+            'confirm_password',
+            'region',
+            'city',
+            'address',
+            'street_address'
+        ]
+
+        return self.check_fields(data, fields)
+
+    # validator methods
+    def update_user_fields(self, data):
+
+        fields = [
+            'first_name',
+            'last_name',
+            'phone_number',
+            'region',
+            'city',
+            'address',
+            'street_address'
+        ]
 
         return self.check_fields(data, fields)
 
@@ -51,9 +103,9 @@ class UserValidator:
 
     def valid_name(self):
         field_names = {
-            'first_name': str(self.data['first_name']),
-            'last_name': str(self.data['last_name']),
-            'username': str(self.data['username'])
+            'first_name': str(self.data['first_name']).strip(),
+            'last_name': str(self.data['last_name']).strip(),
+            'username': str(self.data['username']).strip()
         }
 
         if not field_names['first_name'].isalpha():
@@ -62,6 +114,38 @@ class UserValidator:
             return self.errorHandler('valid_lname')
         elif isinstance(field_names['username'], int):
             return self.errorHandler('valid_username')
+
+        for key, value in field_names.items():
+            if len(value) < 3 or len(value) > 25:
+                return self.errorHandler(key)
+
+    def valid_address_name(self):
+        field_names = {
+            'region': str(self.data['region']).strip(),
+            'city': str(self.data['city']).strip(),
+            'street_address': str(self.data['street_address']).strip(),
+            'address': str(self.data['address']).strip()
+        }
+
+        if isinstance(field_names['region'], int):
+            return self.errorHandler("region")
+        elif isinstance(field_names['city'], int):
+            return self.errorHandler('city')
+        elif isinstance(field_names['address'], int):
+            return self.errorHandler('address')
+        elif isinstance(field_names['street_address'], int):
+            return self.errorHandler('street_address')
+
+    def valid_update_name(self):
+        field_names = {
+            'first_name': str(self.data['first_name']),
+            'last_name': str(self.data['last_name'])
+        }
+
+        if not field_names['first_name'].isalpha():
+            return self.errorHandler("valid_fname")
+        elif not field_names['last_name'].isalpha():
+            return self.errorHandler('valid_lname')
 
         for key, value in field_names.items():
             if len(value) < 3 or len(value) > 25:
@@ -84,7 +168,7 @@ class UserValidator:
     def matching_password(self):
         if str(self.data['password']) != str(self.data['confirm_password']):
             return self.errorHandler('unmatching_pass')
-    
+
     def valid_phone_number(self):
         try:
             input_number = self.data['phone_number']
@@ -92,12 +176,11 @@ class UserValidator:
             num = phonenumbers.parse(input_number, "KE")
             phonenumbers.is_valid_number(num)
         except:
-    	    return self.errorHandler('phone_number')
-    
+            return self.errorHandler('phone_number')
+
     def valid_farmer_bool(self):
-    	try:
-    	    (self.data['is_farmer'] == "True") or (self.data['is_farmer'] == "False")
-    	except:
-    	    return self.errorHandler('is_farmer')
-
-
+        try:
+            (self.data['is_farmer'] == True) or (
+                self.data['is_farmer'] == False)
+        except:
+            return self.errorHandler('is_farmer')

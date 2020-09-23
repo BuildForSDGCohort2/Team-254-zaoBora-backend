@@ -1,5 +1,5 @@
 from flask import jsonify
-from .base_model import BaseModel, AuthenticationRequired
+from app.api.v1.models.base_model import BaseModel
 
 
 class Product(BaseModel):
@@ -17,7 +17,7 @@ class Product(BaseModel):
             self.rprice = product['regular_price']
             self.dprice = product['discounted_price']
             self.prating = product['product_rating']
-            self.preview = product['product_review']
+            self.preview = product['mass']
             self.vendor_id = product['vendor_id']
     
     def save_product(self):

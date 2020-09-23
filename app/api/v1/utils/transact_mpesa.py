@@ -1,15 +1,15 @@
 
-import requests
+# import requests
 
-from datetime import datetime
-import base64
-from requests.auth import HTTPBasicAuth
+# from datetime import datetime
+# import base64
+# from requests.auth import HTTPBasicAuth
 
-import instance.config as keys 
+# import instance.config as keys 
 
-#unformatted_time = datetime.now()
+# unformatted_time = datetime.now()
 # formatted_time = datetime.now().strftime("%Y%m%d%H%M%S")
-#print(formatted_time)
+# print(formatted_time)
 
 
 # data_to_encode = keys.business_ShortCode + keys.lipa_na_mpesa_passkey + formatted_time

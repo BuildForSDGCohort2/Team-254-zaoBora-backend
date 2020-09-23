@@ -1,47 +1,66 @@
 """
-This module defines all the vendor endpoints
+This module defines all the user endpoints
 """
 import re
-import json 
+import json
+import requests
 from flask import jsonify, request, abort, make_response, json, Blueprint
+from flask_jwt_extended import (
+    jwt_required, create_access_token,
+    jwt_refresh_token_required, create_refresh_token,
+    get_jwt_identity, get_jti, get_raw_jwt
+)
 
-# from ..models.vendor_model import Vendor, AuthenticationRequired
-from ..utils.vendors_validator import VendorValidator
+from config.development import ACCESS_EXPIRES, REFRESH_EXPIRES
+from app.api.v1.models.vendor_model import Vendor
+from app.api.v1.utils.users_validator import UserValidator
 
 v1 = Blueprint('vendorv1', __name__, url_prefix='/api/v1')
 
 # endpoint to get all vendors
+
+# for key in cache.keys(): cache.delete(key)
 @v1.route("/vendors", methods=['GET'])
 def get():
-
     vendors = Vendor().fetch_all_vendors()
     vendors_list = []
 
     for vendor in vendors:
-        vendors_list.append(vendor[0])
+        parsed_vendor = eval(vendor[0])
+        vendor_item = {
+            "username": parsed_vendor[0].strip(),
+            "email": parsed_vendor[1].strip(),
+            "first_name": parsed_vendor[2].strip(),
+            "last_name": parsed_vendor[3].strip()
+        }
+
+        vendors_list.append(vendor_item)
 
     return make_response(jsonify({
         "status": 200,
         "vendors": vendors_list
     }), 200)
 
-# endpoint to register/sign up new vendors
-@v1.route("/auth/vendor/signup", methods=['POST'])
-def registration():
-    
-    data = request.get_json()
-    
-    # validate vender's input
-    validate_vendor = VendorValidator(data)
 
-    if validate_vendor.signup_fields(data):
-        return make_response(jsonify(validate_vendor.signup_fields(data)), 400)
-    
+# endpoint to register/sign up new vendors
+@v1.route("/vendor/auth/signup", methods=['POST'])
+def registration():
+    data = request.get_json()
+    revoked_store = Vendor().redis_client
+
+    # validate vendor's input
+    validate_vendor = UserValidator(data)
+
+    if validate_vendor.vendor_signup_fields(data):
+        return jsonify(validate_vendor.vendor_signup_fields(data)), 400
+
     validation_methods = [
         validate_vendor.valid_email,
         validate_vendor.valid_name,
         validate_vendor.validate_password,
-        validate_vendor.matching_password
+        validate_vendor.matching_password,
+        validate_vendor.valid_phone_number,
+        validate_vendor.valid_address_name
     ]
 
     for error in validation_methods:
@@ -57,6 +76,11 @@ def registration():
         "last_name": data['last_name'],
         "email": data['email'],
         "username": data['username'],
+        "phone_number": data['phone_number'],
+        "region": data['region'],
+        "city": data['city'],
+        "address": data['address'],
+        "street_address": data['street_address'],
         "password": data['password']
     }
 
@@ -65,140 +89,154 @@ def registration():
     if reg_vendor.save_vendor():
         return make_response(jsonify(reg_vendor.save_vendor()), 409)
     else:
-        id = reg_vendor.fetch_vendor_id(vendor_data['username'])
-        auth_token = reg_vendor.encode_auth_token(id[0])
+        email = vendor_data['email']
+        access_token = create_access_token(identity=email)
+        refresh_token = create_refresh_token(identity=email)
+        access_jti = get_jti(encoded_token=access_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)
+
+        revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
+        revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+
         return make_response(jsonify({
             "status": 201,
-            "message": "{} registered successfully".format(data['email']),
+            "message": "{} registered successfully".format(email),
             "username": data['username'],
-            "auth_token": auth_token.decode('utf-8')
-        }), 201)        
-            
-# endpoint to login/signin vendor # allows registered vendors to login
-@v1.route("/auth/vendor/login", methods=['POST'])
-def login():
-   data = request.get_json()
-   missing_fields = VendorValidator().login_fields(data)
-
-   if missing_fields:
-      return make_response(jsonify(missing_fields), 400)
-
-   validate_vendor = VendorValidator(data)
-   reg_email = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
-
-   if not re.match(reg_email, str(data['email'])):
-       return make_response(jsonify({
-           "error": validate_vendor.valid_email()
-       }), 422)
-
-   credentials = {
-       "email": data['email'],
-       "password": data['password']
-   }
-
-   log_vendor = Vendor().log_in_vendor(credentials)
-   try:
-       log_vendor['f1'] and log_vendor['f2']
-       auth_token = Vendor().encode_auth_token(log_vendor['f1'])
-       store = {
-            "token": auth_token.decode('utf-8'),
-            "email": credentials['email']
-        }
-       return make_response(jsonify({
-            "status": 201,
-            "message": "{} has been successfully logged in".format(data['email']),
-            "auth_token": auth_token.decode('utf-8'),
-            "id": log_vendor['f1'],
-            "username": log_vendor['f2']
+            "access_token": access_token,
+            "refresh_token": refresh_token
         }), 201)
-   except:
-       return make_response(jsonify(log_vendor), log_vendor['status'])
+
+
+# allows registered vendors to login
+@v1.route("/vendor/auth/login", methods=['POST'])
+def login():
+    data = request.get_json()
+    missing_fields = UserValidator().login_fields(data)
+    revoked_store = Vendor().redis_client
+
+    if missing_fields:
+        return make_response(jsonify(missing_fields), 400)
+
+    validate_vendor = UserValidator(data)
+    reg_email = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
+
+    if not re.match(reg_email, str(data['email'])):
+        return make_response(jsonify({
+            "error": validate_vendor.valid_email()
+        }), 422)
+
+    credentials = {
+        "email": data['email'],
+        "password": data['password']
+    }
+
+    log_vendor_func = Vendor().log_in_vendor(credentials)
+    access_token = create_access_token(identity=credentials['email'])
+    refresh_token = create_refresh_token(identity=credentials['email'])
+
+    try:
+        log_vendor_func['f1'] and log_vendor_func['f2']
+        access_jti = get_jti(encoded_token=access_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)
+
+        revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
+        revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+
+        return make_response(jsonify({
+            "message": "You've been successfully logged in",
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }), 201)
+    except:
+        return make_response(jsonify(log_vendor_func), log_vendor_func['status'])
+
 
 # endpoint allows registered vendors to logout
-@v1.route("/auth/vendor/<int:vendorId>/logout", methods=['POST'])
-# @AuthenticationRequired
+@v1.route("/vendor/auth/access_revoke/<int:vendorId>", methods=['DELETE'])
+@jwt_required
 def logout(vendorId):
-    auth_token = request.headers.get('Authorization')
-    token = auth_token.split(" ")[1]
-    print(token)
+    revoked_store = Vendor().redis_client
+    current_vendor_email = get_jwt_identity()
 
-    if Vendor().log_out_vendor(vendorId) == False:
-        return make_response(jsonify({
-            "error": "Vendor does not exist!",
-            "status": 404
-        }), 404)
+    if not Vendor().log_out_vendor(current_vendor_email, vendorId):
+        return jsonify({"msg": "Forbidden request!"}), 403
     else:
-        username = Vendor().log_out_vendor(vendorId)
+        jti = get_raw_jwt()['jti']
+        
+        revoked_store.set(jti, 'true', ACCESS_EXPIRES * 1.2)
+        return jsonify({"msg": "You've been successully logged out!"}), 200
 
-        det = dict(
-            username=username,
-            token=token
-        )
 
-        values = tuple(det.values())
+# Endpoint for revoking the current vendors refresh token
+@v1.route('/vendor/auth/refresh_revoke/<int:vendorId>', methods=['DELETE'])
+@jwt_refresh_token_required
+def logout2(vendorId):
+    revoked_store = Vendor().redis_client
+    current_vendor_email = get_jwt_identity()
 
-        if Vendor().blacklisted(token):
-            return make_response(jsonify({
-                "error": "Token is blacklisted",
-                "status": 400
-            }), 400)
-        else:
-            Vendor().blacklist(values)
-            return make_response(jsonify({
-                "message": "You have been logged out",
-                "status": 200
-            }), 200)
+    if not Vendor().log_out_vendor(current_vendor_email, vendorId):
+        return jsonify({"msg": "Forbidden request!"}), 403
+    else:
+        jti = get_raw_jwt()['jti']
+        revoked_store.set(jti, 'true', REFRESH_EXPIRES * 1.2)
+        return jsonify({"msg": "Refresh token revoked"}), 200
 
-# endpoint allows a vendor to delete their account
 
 # endpoint allows a vendor to update their account
-@v1.route("/profile/vendor/<int:vendorId>", methods=['PUT', 'GET'])
-# @AuthenticationRequiredc
+@v1.route("/vendor/profile/<int:vendorId>", methods=['PUT', 'GET'])
+@jwt_required
 def update_account(vendorId):
-    auth_token = request.headers.get('Authorization')
-    token = auth_token.split(" ")[1]
+    data = request.get_json()
+    current_vendor_email = get_jwt_identity()
 
-    if request.method == 'PUT':
-        data = request.get_json()
-        if VendorValidator().signup_fields(data):
-            return make_response(jsonify(VendorValidator().signup_fields(data)), 400)
-        else:
-            # Validate vendor
-            validate_vendor = VendorValidator(data)
-            validation_methods = [
-                validate_vendor.valid_email,
-                validate_vendor.valid_name,
-                validate_vendor.validate_password,
-                validate_vendor.matching_password
-            ]
+    if UserValidator().update_user_fields(data):
+        return make_response(jsonify(UserValidator().signup_fields(data)), 400)
+    else:
+        validate_vendor = UserValidator(data)
+        validation_methods = [
+            validate_vendor.valid_update_name,
+            validate_vendor.valid_phone_number
+        ]
 
-            for error in validation_methods:
-                if error():
-                    return make_response(jsonify({
-                        "error": error()
-                    }), 422)
-                    
+        for error in validation_methods:
+            if error():
+                return make_response(jsonify({
+                    "error": error()
+                }), 422)
+
         vendor_data = {
             "first_name": data['first_name'],
             "last_name": data['last_name'],
-            "email": data['email'],
-            "username": data['username'],
-            "password": data['password'],
-        }    
+            "phone_number": data['phone_number'],
+            "region": data['region'],
+            "city": data['city'],
+            "address": data['address'],
+            "street_address": data['street_address']
+        }
 
-        update_vendor = Vendor().update_vendor(vendorId, vendor_data)
-        
+        update_vendor = Vendor().update_vendor(current_vendor_email, vendor_data)
+
         if isinstance(update_vendor, dict):
-            print('==>>', update_vendor)
             return make_response(jsonify(update_vendor), update_vendor['status'])
-        elif Vendor().blacklisted(token):
-            return make_response(jsonify({
-                "error": "Please log in first!"
-            }), 400)
         else:
             return make_response(jsonify({
-                "message": f"user {vendor_data['email']} updated successfully",
+                "message": "Account updated successfully",
                 "status": 200
-            }), 200) 
-        # get updated vendor data
-    
+            }), 200)
+
+
+# endpoint allows a vendor to delete their account
+@v1.route("/vendor/profile/<int:vendorId>", methods=['DELETE'])
+@jwt_required
+def del_account(vendorId):
+    current_vendor_email = get_jwt_identity()
+
+    remove_vendor = Vendor().delete_vendor(current_vendor_email)
+
+    if isinstance(remove_vendor, dict):
+        return make_response(jsonify(remove_vendor), 404)
+    else:
+        return make_response(jsonify({
+            "message": "Vendor deleted successfully user",
+            "status": 200
+        }), 200)

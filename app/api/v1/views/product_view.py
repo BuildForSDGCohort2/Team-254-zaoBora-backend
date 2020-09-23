@@ -4,7 +4,7 @@ This module defines all the products endpoints
 import json
 from flask import request, jsonify, make_response, Blueprint
 
-from ..models.product_model import Product, AuthenticationRequired
+from ..models.product_model import Product
 # from ..models.vendor_model import Vendor, AuthenticationRequired
 
 v1 = Blueprint('productv1', __name__, url_prefix='/api/v1')
@@ -91,7 +91,6 @@ def get_product(productId):
 
 # endpoint to create up new products
 @v1.route("/<int:vendorId>/product", methods=['POST'])
-@AuthenticationRequired
 def create(vendorId):
     data = request.get_json()
     auth_token = request.headers.get('Authorization')
@@ -145,7 +144,6 @@ def create(vendorId):
                    
 # endpoint to update product
 @v1.route("/<int:vendorId>/product/<int:productId>", methods=['PUT'])
-@AuthenticationRequired
 def update_product(productId, vendorId):
     data = request.get_json()
     
@@ -178,7 +176,6 @@ def update_product(productId, vendorId):
     
 # endpoint to delete product
 @v1.route("/<int:vendorId>/product/<int:productId>", methods=['DELETE'])
-@AuthenticationRequired
 def delete_product(productId, vendorId):
     auth_token = request.headers.get('Authorization')
     token = auth_token.split(" ")[1]
