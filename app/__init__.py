@@ -26,7 +26,6 @@ def create_app(config_name):
     # Load configurations specified by the APP_CONFIG_FILE environment variable
     # Variables contained here will override those in the default configuration
     # export APP_CONFIG_FILE=/path/to/config/production.py
-    app.config.from_envvar('APP_CONFIG_FILE')
 
     # init JWT
     jwt = JWTManager()
