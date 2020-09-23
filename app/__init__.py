@@ -22,7 +22,6 @@ def create_app(config_name):
     app.config.from_object('config.development')
 
     # Load the configuration from the instance folder
-    app.config.from_pyfile('config.py')
 
     # Load configurations specified by the APP_CONFIG_FILE environment variable
     # Variables contained here will override those in the default configuration
