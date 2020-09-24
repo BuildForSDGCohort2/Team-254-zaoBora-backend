@@ -1,7 +1,9 @@
 """Configuration for development"""
 import os
+from datetime import timedelta
 
 
+<<<<<<< HEAD
 DEV_DATABASE_URI = os.getenv("postgres://postgres:none@127.0.0.1:5432/zaobora_database")
 DEV_SECRET_KEY = os.getenv('DEV_SECRET_KEY')
 DEV_SECURITY_PASSWORD_SALT = os.getenv('DEV_SECURITY_PASSWORD_SALT')
@@ -10,3 +12,18 @@ DEV_MAIL_PORT = os.getenv('DEV_MAIL_PORT')
 DEV_MAIL_USE_TLS = os.getenv('DEV_MAIL_USE_TLS')
 DEV_SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('DEV_SQLALCHEMY_TRACK_MODIFICATIONS')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+=======
+DATABASE_URI = os.getenv('DATABASE_URI')
+SECRET_KEY = os.getenv('SECRET_KEY')
+REDIS_URL = os.getenv('REDIS_URL')
+SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT')
+MAIL_SERVER = os.getenv('MAIL_SERVER')
+MAIL_PORT = os.getenv('MAIL_PORT')
+MAIL_USE_TLS = os.getenv('MAIL_USE_TLS')
+SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+ACCESS_EXPIRES = timedelta(minutes=15)
+REFRESH_EXPIRES = timedelta(days=30)
+JWT_BLACKLIST_ENABLED = True
+JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+>>>>>>> 60ef1798602651b3989f34da17005b079e237266
