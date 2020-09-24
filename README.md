@@ -11,6 +11,7 @@ Zao Bora is an online platform where people can register and be a part of a comm
 * Python3
 * Git
 * Postmam
+* Redis
 * PostgreSQL
 * python3-venv
 

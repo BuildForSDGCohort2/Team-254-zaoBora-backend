@@ -9,7 +9,7 @@ from flask import jsonify, request, session
 
 from app import create_app
 from app.database import Initialize_DB
-from config.development import DEV_SECRET_KEY
+from config.development import SECRET_KEY
 
 
 class BaseModel(Initialize_DB):
@@ -18,46 +18,7 @@ class BaseModel(Initialize_DB):
     def __init__(self):
         # initializes list of object type
         self.table_name = ''
-
-    @classmethod
-    def encode_auth_token(cls, user_id):
-        # generates authentication token
-
-        # app = create_app(cls.env)
-
-        try:
-            payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24),
-                'iat': datetime.datetime.utcnow(),
-                'sub': user_id
-            }
-            return jwt.encode(
-                payload,
-                DEV_SECRET_KEY,
-                algorithm='HS256'
-            )
-        except Exception as e:
-            return e
-
-    def blacklisted(self, token):
-        # checks whether a token blacklisted
-        query = "SELECT id FROM blacklist WHERE tokens = '{}';".format(token)
-        self.cursor.execute(query)
-        if self.cursor.fetchone():
-            return True
-        return False
-
-    @classmethod
-    def decode_auth_token(cls, auth_token):
-        # takes in token and decodes it
-
-        try:
-            payload = jwt.decode(auth_token, DEV_SECRET_KEY)
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again!'
-        except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again!'
+        self.cache = self.redis_client
 
     def grab_all_items(self, cols, condition, name=''):
         # fetches all items
@@ -107,26 +68,3 @@ class BaseModel(Initialize_DB):
         return self.update(
             "UPDATE {} SET {} WHERE {}".format(name, updates, condition)
         )
-
-
-class AuthenticationRequired:
-    # decorator class validates the token
-
-    def __init__(self, f):
-        self.f = f
-        update_wrapper(self, f)
-
-    def __call__(self, *args, **kwargs):
-        auth_header = request.headers.get('Authorization')
-
-        print(session)
-
-        if not auth_header or len(auth_header) < 8 or " " not in auth_header:
-            return jsonify({"error": "Please log in first...!"}), 403
-
-        auth_token = auth_header.split(" ")[1]
-
-        if isinstance(BaseModel().decode_auth_token(auth_token), str):
-            return jsonify({"error": BaseModel().decode_auth_token(auth_token)}), 401
-
-        return self.f(*args, **kwargs)
