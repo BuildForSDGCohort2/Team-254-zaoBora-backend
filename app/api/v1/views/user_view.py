@@ -4,22 +4,28 @@ This module defines all the user endpoints
 import re
 import json
 import requests
-from flask import jsonify, request, abort, make_response, json, Blueprint
+from flask import (
+    jsonify, request, abort, make_response, json, Blueprint, url_for)
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
     get_jwt_identity, get_jti, get_raw_jwt
 )
+from flask_mail import Message
+from itsdangerous import (
+    URLSafeTimedSerializer, SignatureExpired, BadTimeSignature)
 
-from config.development import ACCESS_EXPIRES, REFRESH_EXPIRES
+from config.development import (
+    ACCESS_EXPIRES, REFRESH_EXPIRES, SECURITY_PASSWORD_SALT, SECRET_KEY)
 from app.api.v1.models.user_model import User
 from app.api.v1.utils.users_validator import UserValidator
 
 v1 = Blueprint('userv1', __name__, url_prefix='/api/v1')
-
-# endpoint to get all users
+serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 # for key in cache.keys(): cache.delete(key)
+
+# endpoint to get all users
 @v1.route("/users", methods=['GET'])
 def get():
     users = User().fetch_all_users()
@@ -40,6 +46,44 @@ def get():
         "status": 200,
         "users": users_list
     }), 200)
+
+
+# Fetch active user
+@v1.route("/fetch-active-user", methods=['GET'])
+@jwt_required
+def fetch_active_user():
+    try:
+        active_user_email = get_jwt_identity()
+        userDetails = User().fetch_specific_user(
+            'first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer',
+            f"email = '{active_user_email}'",
+            'users'
+        );
+        user = {
+            "first_name": userDetails[0].strip(),
+            "last_name": userDetails[1].strip(),
+            "username": userDetails[2].strip(),
+            "phone_number": userDetails[3].strip(),
+            "email": userDetails[4].strip(),
+            "city": userDetails[5].strip(),
+            "region": userDetails[6].strip(),
+            "address": userDetails[7].strip(),
+            "street_address": userDetails[8].strip(),
+            "is_farmer": userDetails[9]
+        }
+        
+        access_token = create_access_token(identity=active_user_email)
+        refresh_token = create_refresh_token(identity=active_user_email)
+        print(user)
+
+        return jsonify({
+            'user': user,
+            'authenticated': True,
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }), 200
+    except:
+        return jsonify({ 'msg': 'User not found!' }), 404
 
 
 # endpoint to register/sign up new users
@@ -109,6 +153,38 @@ def registration():
         }), 201)
 
 
+# @v1.route('/verify-email', methods=['GET', 'POST'])
+# def verify_email():
+#     mail = User().mail
+    
+#     if request.method == 'GET':
+#         return '<form action="/api/v1/verify-email" method="POST"><input type="text" name="email" /><input type="submit"/></form>'
+
+#     email = request.form['email']
+#     token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+#     msg = Message("Please confirm your email",
+#                   sender="zaobora@yahoo.com",
+#                   recipients=[email])
+#     link = url_for('userv1.confirm_email', token=token, external=True)
+    
+#     msg.body = 'Follow this link {}'.format(link)
+#     print('Follow this link {}'.format(link))
+#     print('===> ',mail)
+#     mail.send(msg)
+#     return "<h1>The email you entered is {}.<br /> The token is {}</h1>".format(email, token)
+
+
+# @v1.route('/confirm-email/<token>')
+# def confirm_email(token):
+#     try:
+#         email = serializer.loads(token, salt=SECURITY_PASSWORD_SALT, max_age=30)
+#         return '<h1>The token works!</h1><br /><b>{}</b>'.format(email)
+#     except SignatureExpired:
+#         return '<h1>The token has expired!</h1>'
+#     except BadTimeSignature:
+#         return '<h1>The token is invalid!</h1>'
+
+
 # The jwt_refresh_token_required decorator insures a valid refresh
 # token is present in the request before calling this endpoint. We
 # can use the get_jwt_identity() function to get the identity of
@@ -157,14 +233,16 @@ def login():
         "password": data['password']
     }
 
-    log_user_func = User().log_in_user(credentials)
+    user = User().log_in_user(credentials)
     access_token = create_access_token(identity=credentials['email'])
     refresh_token = create_refresh_token(identity=credentials['email'])
 
     try:
-        log_user_func['f1'] and log_user_func['f2']
+        user['status']
+        return make_response(jsonify(user), user['status'])
+    except:
         access_jti = get_jti(encoded_token=access_token)
-        refresh_jti = get_jti(encoded_token=refresh_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)        
 
         revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
         revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
@@ -172,20 +250,20 @@ def login():
         return make_response(jsonify({
             "message": "You've been successfully logged in",
             "access_token": access_token,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
+            "authenticated": True,
+            "user": user
         }), 201)
-    except:
-        return make_response(jsonify(log_user_func), log_user_func['status'])
 
 
 # endpoint allows registered users to logout
-@v1.route("/auth/access_revoke/<int:userId>", methods=['DELETE'])
+@v1.route("/auth/access_revoke/<string:userEmail>", methods=['DELETE'])
 @jwt_required
-def logout(userId):
+def logout(userEmail):
     revoked_store = User().redis_client
-    current_user_email = get_jwt_identity()
+    auth_user_email = get_jwt_identity()
 
-    if not User().log_out_user(current_user_email, userId):
+    if auth_user_email != userEmail:
         return jsonify({"msg": "Forbidden request!"}), 403
     else:
         jti = get_raw_jwt()['jti']
@@ -195,13 +273,13 @@ def logout(userId):
 
 
 # Endpoint for revoking the current users refresh token
-@v1.route('/auth/refresh_revoke/<int:userId>', methods=['DELETE'])
+@v1.route('/auth/refresh_revoke/<string:userEmail>', methods=['DELETE'])
 @jwt_refresh_token_required
-def logout2(userId):
+def logout2(userEmail):
     revoked_store = User().redis_client
-    current_user_email = get_jwt_identity()
+    auth_user_email = get_jwt_identity()
 
-    if not User().log_out_user(current_user_email, userId):
+    if auth_user_email != userEmail:
         return jsonify({"msg": "Forbidden request!"}), 403
     else:
         jti = get_raw_jwt()['jti']

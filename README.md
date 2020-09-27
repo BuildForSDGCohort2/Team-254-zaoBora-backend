@@ -15,25 +15,7 @@ Zao Bora is an online platform where people can register and be a part of a comm
 * PostgreSQL
 * python3-venv
 
-## Getting Started
-
-### Setting up
-
-================================
-
-Step 1: Click on Fork at the top right corner
-
-Step 3: cd into the cloned folder | cd Team-254-zaoBora-backend
-
-Step 4: ` git remote add upstream <https://github.com/http://127.0.0.1:5000/> `
-
-Step 5: ` git pull upstream develop `
-
-Step 6: Check out to the task branch | ` git checkout -b <NAME_OF_THE_TASK> `
-
-e.g git checkout -b develop/ft-authentication-endpoints
-
-#### Running the project locally (Linux)
+## Project setup (Linux)
 
 ================================
 
@@ -63,7 +45,7 @@ $ source .env
 $ createdb zaobora_database
 ```
 
-5. Install
+5. Install dependencies
 ```
 $ pip install -r requirements.txt
 $ pip freeze > requirements.txt
@@ -74,7 +56,7 @@ $ pip freeze > requirements.txt
 $ python run.py
 ```
 
-#### Running the project locally (Windows)
+## Project setup (Windows)
 
 ================================
 
@@ -112,65 +94,8 @@ $ pip freeze > requirements.txt
 $ python run.py
 ```
 
-#### Creating a pull request
+## Authors
 
-Run git branch It should show that you are on your current branch
-
-After implementing your task
-
-Step 1: Run: ` git add . `
-
-Step 2: Run: ` git commit -m "< COMMIT MESSAGE >" `
-
-Step 3: ` git pull upstream develop `
-
-Step 4: ` git push origin < BRANCH_NAME > `
-
-Go to the repository <https://github.com/BuildForSDGCohort2/Team-254-zaoBora-backend>
-
-As soon as you get there, you are going to see a green notification ‘compare and create a pull request’
-
-Click on it, type your message,and click create pull request.
-
-If you have any more questions, please check out this resource  <https://www.youtube.com/watch?v=HbSjyU2vf6Y>
-
-## The following are API endpoints enabling one to
-
-* Create an account and login
-
-### ZaoBora application endpoints
-
-| Endpoint(URLs)                             | Functionality         | HTTP Method    |
-|--------------------------------------------|-----------------------|----------------|
-| '/users'                                   | Get all users         | GET            |
-| '/auth/signup'                             | Register a new user   | POST           |
-| '/auth/login'                              | Login a user          | POST           |
-| '/auth/<int:userId>/logout'                | Logout a user         | POST           |
-| '/profile/<int:userId>'                    | Delete user account   | DELETE         |
-| '/profile/<int:userId>'                    | Update user account   | PUT            |
-|--------------------------------------------|-----------------------|----------------|
-| '/vendors'                                 | Get all vendors       | GET            |
-| '/auth/vendor/signup'                      | Register a new vendor | POST           |
-| '/auth/vendor/login'                       | Login a vendor        | POST           |
-| '/auth/vendor/<int:vendorId>/logout'       | Logout a vendor       | POST           |
-| '/profile/vendor/<int:vendorId>'           | Update vendor account | PUT            |
-|--------------------------------------------|-----------------------|----------------|
-| '/products'                                | Get all products      | GET            |
-| '/<int:vendorId>/product'                  | Create a new product  | POST           |
-| '/products/<int:productId>'                 | Get a single product  | GET            |
-| '/<int:vendorId>/product/<int:productId>'  | Update a product      | GET            |
-| '/<int:vendorId>/product/<int:productId>'  | Delete a product      | DELETE         |
-|                                            |                       |                |
-
-### Authors
-
-#### Frontend
-
-1. David Macharia (<https://github.com/Dave-mash>)
-2. Alexander Thuo (<https://github.com/zanderthuo>)
-3. Margret Njeri (<https://github.com/Njeri-Marg>)
-
-#### Backend
-
-1. Derrick Moseti (<https://github.com/moseti1>)
-2. Jordan Muthemba (<https://github.com/Jordan-type>)
+1. [Derrick Moseti](<https://github.com/moseti1>)
+2. [Jordan Muthemba](<https://github.com/Jordan-type>)
+3. [David Macharia](<https://github.com/Dave-mash>)
