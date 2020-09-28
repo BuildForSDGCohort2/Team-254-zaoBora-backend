@@ -19,7 +19,7 @@ def sms_send():
 
     #Send the SMS
     try:
-        #Once this is done, that's it! We'll handle the rest
+        #Once this is done, that's it! api will handle the rest
         response = sms.send(message, recipients, sender)
         print(response)
     except Exception as e:
