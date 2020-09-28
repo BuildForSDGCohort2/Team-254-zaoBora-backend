@@ -1,5 +1,5 @@
-import psycopg2
 import os
+import psycopg2
 
 class Initialize_DB:
 

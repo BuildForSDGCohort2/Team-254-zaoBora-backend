@@ -63,4 +63,3 @@
     
 #     print (response.text)
     
-# lipa_na_mpesa()
