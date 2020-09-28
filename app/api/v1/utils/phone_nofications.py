@@ -13,7 +13,7 @@ def sms_send():
     sms = africastalking.SMS
 
     #Define some options that we will use to send the SMS
-    recipients = ['+254700867925']
+    recipients = ['reciever phone number goes here']
     message = 'Hello,Zaobora notifies you.Blink!'
     sender = "45676"
 
