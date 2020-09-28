@@ -7,6 +7,7 @@ class Initialize_DB:
     def __init__(cls, db_url):
         cls.env = db_url.env
         cls.redis_client = None
+        cls.mail = None
 
     @classmethod
     def init_db(cls, db_url):
@@ -21,6 +22,11 @@ class Initialize_DB:
     def init_redis(cls, redis_client):
         # Initialize redis_client
         cls.redis_client = redis_client
+
+    @classmethod
+    def init_mail(cls, mail):
+        # Initialize mail
+        cls.mail = mail
 
     @classmethod
     def create_tables(cls):
@@ -40,6 +46,7 @@ class Initialize_DB:
                 region CHAR(20),
                 city CHAR(20),
                 street_address CHAR(20),
+                email_confirmed BOOLEAN DEFAULT false,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 updated_on TIMESTAMP DEFAULT current_timestamp
             );
@@ -56,6 +63,7 @@ class Initialize_DB:
                 region CHAR(20),
                 city CHAR(20),
                 street_address CHAR(20),
+                email_confirmed BOOLEAN DEFAULT false,
                 registered_on TIMESTAMP DEFAULT current_timestamp,
                 updated_on TIMESTAMP DEFAULT current_timestamp
             );

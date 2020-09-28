@@ -90,18 +90,30 @@ class User(BaseModel):
                 "status": 403
             }
         else:
-            return self.base_model.grab_items('(id, username)', f"email = '{details['email']}'", 'users')[0]
+            userDetails = self.base_model.grab_items(
+                '(first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer)', f"email = '{details['email']}'", 'users'
+            )[0]
 
-    def log_out_user(self, user_email, id):
-         # logs out a user
+            return {
+                "first_name": userDetails['f1'].strip(),
+                "last_name": userDetails['f2'].strip(),
+                "username": userDetails['f3'].strip(),
+                "phone_number": userDetails['f4'].strip(),
+                "email": userDetails['f5'].strip(),
+                "city": userDetails['f6'].strip(),
+                "region": userDetails['f7'].strip(),
+                "address": userDetails['f8'].strip(),
+                "street_address": userDetails['f9'].strip(),
+                "is_farmer": userDetails['f10']
+            }
 
-        user = self.fetch_specific_user('email', f"id = '{id}'", 'users')
-        valid_user = user and user[0].strip()
+    # def log_out_user(self, user_auth_email, email):
+    #      # logs out a user
         
-        if valid_user and (valid_user == user_email):
-            return valid_user
-        else:
-            return False
+    #     if user_auth_email == email:
+    #         return True
+    #     else:
+    #         return False
 
     def delete_user(self, email):
          # defines the delete query
