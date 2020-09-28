@@ -103,21 +103,26 @@ def create_app(config_name):
         return jsonify({'status': 405, 'message': 'Method not allowed'}), 405
 
     # Send email
-    @app.route("/api/v1/verify-email", methods=['GET', 'POST'])
+    @app.route("/api/v1/verify-email", methods=['POST'])
     def verify_email():
-        if request.method == 'GET':
-            return '<form action="/api/v1/verify-email" method="POST"><input type="text" name="email" /><input type="submit"/></form>'
-
-        email = request.form['email']
-        token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
-        msg = Message("Please confirm your email",
-                    sender="zaobora@yahoo.com",
-                    recipients=[email])
-        link = url_for('confirm_email', token=token, _external=True)
-        
-        msg.body = 'Follow this link {}'.format(link)
-        mail.send(msg)
-        return "<h1>The email you entered is {}.<br /> The token is {}</h1>".format(email, token)
+        try:
+            data = request.get_json()
+            email = data['email']
+            token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+            msg = Message("Please confirm your email",
+                        sender="zaobora@gmail.com",
+                        recipients=[email])
+            link = url_for('confirm_email', token=token, _external=True)
+            
+            msg.body = 'Follow this link {}'.format(link)
+            mail.send(msg)
+            return jsonify({
+                "msg": "Email sent successfully"
+            }), 200
+        except:
+            return jsonify({
+                "error": "unable to send email"
+            }), 400
 
     # Verify email
     @app.route('/api/v1/confirm_email/<token>')
