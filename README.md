@@ -51,7 +51,7 @@ $ sudo apt-get install python3-venv
 ```
 $ python -m pip install --upgrade pip
 $ cd Team-254-zaoBora-backend
-$ python -m venv env
+$ python3 -m venv env
 ```
 
 4. Set the environment variables and create db
