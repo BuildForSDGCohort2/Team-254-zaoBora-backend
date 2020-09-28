@@ -12,7 +12,7 @@ class Initialize_DB:
     @classmethod
     def init_db(cls, db_url):
         try:
-            cls.connection = psycopg2.connect(user="postgres",password="postgres",host="127.0.0.1",port="5432",database='zaobora_database')
+            cls.connection = psycopg2.connect(db_url)
             cls.cursor = cls.connection.cursor()
             print(f'A connection to {db_url} database was established!')
         except:

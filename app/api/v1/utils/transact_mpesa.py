@@ -61,10 +61,5 @@
     
 #     response = requests.post(api_url, json = request, headers=headers)
     
-<<<<<<< HEAD
 #     print (response.text)
     
-=======
-    print (response.text)
-   
->>>>>>> fc74f95c7f1507b517b666f07273c7b788e7eeee
