@@ -1,16 +1,16 @@
 import os
-from flask import Flask, jsonify, request, url_for
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager)
 from flask_redis import FlaskRedis
 from flask_mail import Mail
 from flask_mail import Message
-from itsdangerous import (
-    URLSafeTimedSerializer, SignatureExpired, BadTimeSignature)
 
 from app.database import Initialize_DB
 from flask_mpesa import MpesaAPI
 from config.development import DATABASE_URI
+from app.api.v1.utils.email import mail
+
 
 def create_app(config_name):
     # func to initialize Flask app
@@ -52,10 +52,7 @@ def create_app(config_name):
     app.register_blueprint(order_v1)
 
     # init Flask-Mail
-    mail = Mail(app)
-    SECURITY_PASSWORD_SALT = app.config['SECURITY_PASSWORD_SALT']
-    SECRET_KEY = app.config['SECRET_KEY']
-    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    mail.init_app(app)
 
     # instantiate mpesa
     mpesaapi= MpesaAPI()
@@ -85,7 +82,6 @@ def create_app(config_name):
     @app.route('/index')
     @app.route('/api/v1')
     def index():
-        print('HERE: ',mail)
         # endpoint for the landing page
 
         return jsonify({'status': 200, 'message': 'Welcome to ZaoBora'})
@@ -102,37 +98,38 @@ def create_app(config_name):
 
         return jsonify({'status': 405, 'message': 'Method not allowed'}), 405
 
-    # Send email
-    @app.route("/api/v1/verify-email", methods=['POST'])
-    def verify_email():
-        try:
-            data = request.get_json()
-            email = data['email']
-            token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
-            msg = Message("Please confirm your email",
-                        sender="zaobora@gmail.com",
-                        recipients=[email])
-            link = url_for('confirm_email', token=token, _external=True)
+    # # Send email
+    # @app.route("/api/v1/verify-email", methods=['POST'])
+    # def verify_email():
+    #     try:
+    #         data = request.get_json()
+    #         email = data['email']
+    #         token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+    #         msg = Message("Please confirm your email",
+    #                     sender="zaobora@gmail.com",
+    #                     recipients=[email])
+    #         link = url_for('confirm_email', token=token, _external=True)
             
-            msg.body = 'Follow this link {}'.format(link)
-            mail.send(msg)
-            return jsonify({
-                "msg": "Email sent successfully"
-            }), 200
-        except:
-            return jsonify({
-                "error": "unable to send email"
-            }), 400
+    #         msg.body = 'Follow this link {}'.format(link)
+    #         mail.send(msg)
+    #         return jsonify({
+    #             "msg": "Email sent successfully"
+    #         }), 200
+    #     except:
+    #         return jsonify({
+    #             "error": "unable to send email"
+    #         }), 400
 
-    # Verify email
-    @app.route('/api/v1/confirm_email/<token>')
-    def confirm_email(token):
-        try:
-            email = serializer.loads(token, salt=SECURITY_PASSWORD_SALT, max_age=3600)
-            return '<h1>The token works!</h1><br /><b>{}</b>'.format(email)
-        except SignatureExpired:
-            return '<h1>The token has expired!</h1>'
-        except BadTimeSignature:
-            return '<h1>The token is invalid!</h1>'
+    # # Verify email
+    # @app.route('/api/v1/confirm_email/<token>')
+    # def confirm_email(token):
+    #     try:
+    #         email = serializer.loads(token, salt=SECURITY_PASSWORD_SALT, max_age=3600)
+
+    #         return jsonify({ "msg": "Email sent successfully" }), 200
+    #     except SignatureExpired:
+    #         return jsonify({ "error": "The token has expired!" }), 403
+    #     except BadTimeSignature:
+    #         return jsonify({ "error": "The token is invalid!" }), 403
 
     return app

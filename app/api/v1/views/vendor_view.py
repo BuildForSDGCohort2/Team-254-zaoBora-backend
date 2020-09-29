@@ -4,7 +4,7 @@ This module defines all the user endpoints
 import re
 import json
 import requests
-from flask import jsonify, request, abort, make_response, json, Blueprint
+from flask import jsonify, request, abort, make_response, json, Blueprint, url_for
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
@@ -13,7 +13,9 @@ from flask_jwt_extended import (
 
 from config.development import ACCESS_EXPIRES, REFRESH_EXPIRES
 from app.api.v1.models.vendor_model import Vendor
+from app.api.v1.models.user_model import User
 from app.api.v1.utils.users_validator import UserValidator
+from app.api.v1.utils.email import send_email, generate_verification_token, confirm_verification_token
 
 v1 = Blueprint('vendorv1', __name__, url_prefix='/api/v1')
 
@@ -98,13 +100,19 @@ def registration():
         revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
         revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
 
-        return make_response(jsonify({
-            "status": 201,
-            "message": "{} registered successfully".format(email),
-            "username": data['username'],
+        tokens = {
             "access_token": access_token,
-            "refresh_token": refresh_token
-        }), 201)
+            "refresh_token": refresh_token,
+            "username": data['username']
+        }
+
+        token = generate_verification_token(email)
+        verification_email = url_for(
+            'vendorv1.confirm_vendor_email', token=token, _external=True)
+        print('link ==> ',verification_email)
+        send_mail_res = send_email(email, tokens, verification_email)
+
+    return jsonify(send_mail_res), send_mail_res['status']
 
 
 # allows registered vendors to login
@@ -130,56 +138,72 @@ def login():
         "password": data['password']
     }
 
-    log_vendor_func = Vendor().log_in_vendor(credentials)
+    vendor = Vendor().log_in_vendor(credentials)
     access_token = create_access_token(identity=credentials['email'])
     refresh_token = create_refresh_token(identity=credentials['email'])
 
     try:
-        log_vendor_func['f1'] and log_vendor_func['f2']
+        vendor['status']
+        return make_response(jsonify(vendor), vendor['status'])
+    except:
+        email = vendor['email']
         access_jti = get_jti(encoded_token=access_token)
         refresh_jti = get_jti(encoded_token=refresh_token)
 
         revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
         revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
 
-        return make_response(jsonify({
-            "message": "You've been successfully logged in",
-            "access_token": access_token,
-            "refresh_token": refresh_token
-        }), 201)
-    except:
-        return make_response(jsonify(log_vendor_func), log_vendor_func['status'])
+        if not vendor['email_confirmed']:        
+            token = generate_verification_token(email)
+            verification_email = url_for(
+                'userv1.confirm_email', token=token, _external=True)
+            tokens = {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "username": vendor['username']
+            }
+            send_mail_res = send_email(email, tokens, verification_email)
+
+            return jsonify(send_mail_res), send_mail_res['status']
+        else:
+            return make_response(jsonify({
+                "message": "You've been successfully logged in",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "authenticated": True,
+                "vendor": vendor
+            }), 201)
 
 
-# endpoint allows registered vendors to logout
-@v1.route("/vendor/auth/access_revoke/<int:vendorId>", methods=['DELETE'])
-@jwt_required
-def logout(vendorId):
-    revoked_store = Vendor().redis_client
-    current_vendor_email = get_jwt_identity()
+# # endpoint allows registered vendors to logout
+# @v1.route("/vendor/auth/access_revoke/<int:vendorId>", methods=['DELETE'])
+# @jwt_required
+# def logout(vendorId):
+#     revoked_store = Vendor().redis_client
+#     current_vendor_email = get_jwt_identity()
 
-    if not Vendor().log_out_vendor(current_vendor_email, vendorId):
-        return jsonify({"msg": "Forbidden request!"}), 403
-    else:
-        jti = get_raw_jwt()['jti']
+#     if not Vendor().log_out_vendor(current_vendor_email, vendorId):
+#         return jsonify({"msg": "Forbidden request!"}), 403
+#     else:
+#         jti = get_raw_jwt()['jti']
         
-        revoked_store.set(jti, 'true', ACCESS_EXPIRES * 1.2)
-        return jsonify({"msg": "You've been successully logged out!"}), 200
+#         revoked_store.set(jti, 'true', ACCESS_EXPIRES * 1.2)
+#         return jsonify({"msg": "You've been successully logged out!"}), 200
 
 
-# Endpoint for revoking the current vendors refresh token
-@v1.route('/vendor/auth/refresh_revoke/<int:vendorId>', methods=['DELETE'])
-@jwt_refresh_token_required
-def logout2(vendorId):
-    revoked_store = Vendor().redis_client
-    current_vendor_email = get_jwt_identity()
+# # Endpoint for revoking the current vendors refresh token
+# @v1.route('/vendor/auth/refresh_revoke/<int:vendorId>', methods=['DELETE'])
+# @jwt_refresh_token_required
+# def logout2(vendorId):
+#     revoked_store = Vendor().redis_client
+#     current_vendor_email = get_jwt_identity()
 
-    if not Vendor().log_out_vendor(current_vendor_email, vendorId):
-        return jsonify({"msg": "Forbidden request!"}), 403
-    else:
-        jti = get_raw_jwt()['jti']
-        revoked_store.set(jti, 'true', REFRESH_EXPIRES * 1.2)
-        return jsonify({"msg": "Refresh token revoked"}), 200
+#     if not Vendor().log_out_vendor(current_vendor_email, vendorId):
+#         return jsonify({"msg": "Forbidden request!"}), 403
+#     else:
+#         jti = get_raw_jwt()['jti']
+#         revoked_store.set(jti, 'true', REFRESH_EXPIRES * 1.2)
+#         return jsonify({"msg": "Refresh token revoked"}), 200
 
 
 # endpoint allows a vendor to update their account
@@ -237,6 +261,37 @@ def del_account(vendorId):
         return make_response(jsonify(remove_vendor), 404)
     else:
         return make_response(jsonify({
-            "message": "Vendor deleted successfully user",
+            "message": "Vendor deleted successfully",
             "status": 200
         }), 200)
+
+
+@v1.route('/confirm-vendor-email/<token>')
+def confirm_vendor_email(token):
+    email = confirm_verification_token(token)
+
+    if isinstance(email, str):
+        try:
+            vendor = Vendor().fetch_specific_vendor(
+                'email',
+                f"email = '{email}'",
+                'vendors'
+            )
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "error": "Error processing request"
+            }), 400
+
+        if not vendor:
+            print('vendor --> ',vendor)
+            return jsonify({
+                "error": "Error fetching email"
+            }), 422
+        else:
+            User().verify_email(email, 'vendors')
+            return jsonify({
+                "msg": "Email verified successfully"
+            }), 200
+    else:
+        return jsonify(email), email['status']

@@ -91,7 +91,9 @@ class User(BaseModel):
             }
         else:
             userDetails = self.base_model.grab_items(
-                '(first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer)', f"email = '{details['email']}'", 'users'
+                '(first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer, email_confirmed)',
+                f"email = '{details['email']}'",
+                'users'
             )[0]
 
             return {
@@ -104,7 +106,8 @@ class User(BaseModel):
                 "region": userDetails['f7'].strip(),
                 "address": userDetails['f8'].strip(),
                 "street_address": userDetails['f9'].strip(),
-                "is_farmer": userDetails['f10']
+                "is_farmer": userDetails['f10'],
+                "email_confirmed": userDetails['f11']
             }
 
     # def log_out_user(self, user_auth_email, email):
@@ -146,5 +149,18 @@ class User(BaseModel):
             return {
                 "error": "User not found or does not exist!",
                 "status": 404
-            }    
+            }
+
+    def verify_email(self, email, account):
+        # This method defines the update query
+        
+        pairs = "email_confirmed = true"
+
+        if self.fetch_specific_user('email', f"email = '{email}'", account):
+            return self.base_model.update_item(pairs, f"email = '{email}'", account)
+        else:
+            return {
+                "error": "User not found or does not exist!",
+                "status": 404
+            }
         
