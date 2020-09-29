@@ -88,18 +88,35 @@ class Vendor(BaseModel):
                 "status": 403
             }
         else:
-            return self.base_model.grab_items('(id, username)', f"email = '{details['email']}'", 'vendors')[0]
+            vendorDetails = self.base_model.grab_items(
+                '(first_name, last_name, username, phone_number, email, city, region, address, street_address, email_confirmed)',
+                f"email = '{details['email']}'",
+                'vendors'
+            )[0]
 
-    def log_out_vendor(self, vendor_email, id):
-         # logs out a vendor
+            return {
+                "first_name": vendorDetails['f1'].strip(),
+                "last_name": vendorDetails['f2'].strip(),
+                "username": vendorDetails['f3'].strip(),
+                "phone_number": vendorDetails['f4'].strip(),
+                "email": vendorDetails['f5'].strip(),
+                "city": vendorDetails['f6'].strip(),
+                "region": vendorDetails['f7'].strip(),
+                "address": vendorDetails['f8'].strip(),
+                "street_address": vendorDetails['f9'].strip(),
+                "email_confirmed": vendorDetails['f10']
+            }
 
-        vendor = self.fetch_specific_vendor('email', f"id = '{id}'", 'vendors')
-        valid_vendor = vendor and vendor[0].strip()
+    # def log_out_vendor(self, vendor_email, id):
+    #      # logs out a vendor
+
+    #     vendor = self.fetch_specific_vendor('email', f"id = '{id}'", 'vendors')
+    #     valid_vendor = vendor and vendor[0].strip()
         
-        if valid_vendor and (valid_vendor == vendor_email):
-            return valid_vendor
-        else:
-            return False
+    #     if valid_vendor and (valid_vendor == vendor_email):
+    #         return valid_vendor
+    #     else:
+    #         return False
 
     def delete_vendor(self, email):
          # defines the delete query
