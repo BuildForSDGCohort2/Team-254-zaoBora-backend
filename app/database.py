@@ -91,7 +91,9 @@ class Initialize_DB:
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 quantity INTEGER NOT NULL,
                 unit_price INTEGER NOT NULL,
-                total INTEGER NOT NULL
+                total INTEGER NOT NULL,
+                created_on TIMESTAMP DEFAULT current_timestamp,
+                updated_on TIMESTAMP DEFAULT current_timestamp
             );
 
             CREATE TABLE IF NOT EXISTS reviews (
@@ -128,7 +130,8 @@ class Initialize_DB:
                 delivery_fee INT DEFAULT 0,
                 subtotal INTEGER NOT NULL,
                 total INTEGER NOT NULL,
-                created_on TIMESTAMP DEFAULT current_timestamp
+                created_on TIMESTAMP DEFAULT current_timestamp,
+                updated_on TIMESTAMP DEFAULT current_timestamp
             );
             """
         )
