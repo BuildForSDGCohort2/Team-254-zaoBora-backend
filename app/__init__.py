@@ -44,12 +44,14 @@ def create_app(config_name):
     from app.api.v1.views.product_view import v1 as product_v1
     from app.api.v1.views.vendor_view import v1 as vendor_v1
     from app.api.v1.views.order_view import v1 as order_v1
+    from app.api.v1.views.review_view import v1 as review_v1
 
     # Register blueprints
     app.register_blueprint(user_v1)
     app.register_blueprint(product_v1)
     app.register_blueprint(vendor_v1)
     app.register_blueprint(order_v1)
+    app.register_blueprint(review_v1)
 
     # init Flask-Mail
     mail.init_app(app)

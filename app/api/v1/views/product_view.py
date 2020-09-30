@@ -4,49 +4,33 @@ This module defines all the products endpoints
 import json
 from flask import request, jsonify, make_response, Blueprint
 
-from ..models.product_model import Product
-# from ..models.vendor_model import Vendor, AuthenticationRequired
+from app.api.v1.models.product_model import Product
+from app.api.v1.models.vendor_model import Vendor
 
 v1 = Blueprint('productv1', __name__, url_prefix='/api/v1')
 
 # endpoint to get all products
 @v1.route("/products", methods=['GET'])
 def get():
-    products = Product().fetch_all_products('(product_name, description, quantity, regular_price, id, discounted_price, product_rating, product_review, created_on, vendor_id)', 'True = True', 'products')
+    products = Product().fetch_all_products(
+        '(vendor_id, product_name, description, quantity, regular_price, discounted_price, product_rating, mass, created_on)', 'True = True', 'products')
     products_list = []
-    
-    # print('products are', products)
         
     for product in products:
-        
         parsed_product = eval(product[0])
-        # print('parsed_product is', parsed_product[0])
-        # print('parsed_product is', parsed_product[1])
-        # print('product is', product)
-        # print ('Output==>', type(product[0]))
-        
-        username = Vendor().fetch_specific_vendor('username', f"id = {parsed_product[9]}", 'vendors')[0]
-        # print('output:', username)
+        username = Vendor().fetch_specific_vendor('username', f"id = {parsed_product[0]}", 'vendors')[0]
         
         product_item = {
-            "product_name": parsed_product[0],
-            "description": parsed_product[1],
-            "quantity": parsed_product[2],
-            "regular_price": parsed_product[3],
-            "id": parsed_product[4],
+            "vendor_name": username.strip(),
+            "product_name": parsed_product[1],
+            "description": parsed_product[2],
+            "quantity": parsed_product[3],
+            "regular_price": parsed_product[4],
             "discounted_price": parsed_product[5],
             "product_rating": parsed_product[6],
-            "product_review": parsed_product[7],
-            "created_on": parsed_product[8],
-            "vendor_id": parsed_product[9],
-            "vendor_name": username
+            "mass": parsed_product[7].strip(),
+            "created_on": parsed_product[8]
         }
-        
-        # print('output',product_item)
-        # res = eval(product[0])
-        # print('Output Two:', product_item) 
-        # print ('Output====>', tuple(product[0]))
-        # print ('EVAL Output<==>', res)
         
         products_list.append(product_item)
 

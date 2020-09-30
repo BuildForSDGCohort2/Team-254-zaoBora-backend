@@ -3,7 +3,7 @@ from app.api.v1.models.base_model import BaseModel
 
 
 class Product(BaseModel):
-    # model class for products object
+    # model class for products
     
     def __init__(self, product={}):
         
@@ -50,7 +50,7 @@ class Product(BaseModel):
     def fetch_all_products(self, fields, condition, name):
         # fetches all products
         
-        return self.base_model.grab_all_items('(product_name, description, quantity, regular_price, id, discounted_price, product_rating, product_review, created_on, vendor_id)', condition, name) 
+        return self.base_model.grab_all_items(fields, condition, name)
     
     def fetch_specific_product(self, cols, condition, name):
         #  fetches a single product

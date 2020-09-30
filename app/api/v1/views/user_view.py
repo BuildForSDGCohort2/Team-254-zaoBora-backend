@@ -35,7 +35,6 @@ BASE_URL = 'https://buildforsdgcohort2.github.io/Team-254-zaoBora-frontend/#/'
 
 @v1.route("/users", methods=['GET'])
 def get():
-    print('---> ', current_app)
     users = User().fetch_all_users()
     users_list = []
 
@@ -216,16 +215,10 @@ def resend_email(acc_type):
         f"email = '{email}'",
         acc_type
     )
-    print('Duplicate email: ', dup_email)
 
-    if not dup_email:
+    if (not dup_email) or (email == auth_user_email):
         try:
             users or vendors
-            user = User().fetch_specific_user(
-                'email',
-                f"email = '{auth_user_email}'",
-                acc_type
-            )
             token = generate_verification_token(email)
             verification_email = url_for(
                 'userv1.confirm_email', token=token, _external=True)
@@ -247,7 +240,6 @@ def resend_email(acc_type):
 # can use the get_jwt_identity() function to get the identity of
 # the refresh token, and use the create_access_token() function again
 # to make a new access token for this identity.
-
 
 # Refresh token endpoint
 @v1.route('/refresh', methods=['POST'])
