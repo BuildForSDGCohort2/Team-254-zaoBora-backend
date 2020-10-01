@@ -113,8 +113,8 @@ class Initialize_DB:
                 customer_id INT REFERENCES users(id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 tracking_id CHAR(100) UNIQUE NOT NULL,
-                items TEXT[] NOT NULL,
-                status CHAR(20) NULL,
+                items TEXT NOT NULL,
+                status CHAR(20) DEFAULT 'pending' NOT NULL,
                 total INTEGER NOT NULL,
                 created_on TIMESTAMP DEFAULT current_timestamp,
                 updated_on TIMESTAMP DEFAULT current_timestamp

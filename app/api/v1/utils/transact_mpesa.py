@@ -1,11 +1,11 @@
 
 # import requests
-
 # from datetime import datetime
 # import base64
 # from requests.auth import HTTPBasicAuth
 
-# import instance.config as keys 
+# import instance.config as keys
+# from flask import current_app
 
 # unformatted_time = datetime.now()
 # formatted_time = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -40,7 +40,8 @@
 
 
 
-# def lipa_na_mpesa():
+def lipa_na_mpesa():
+    return True
 
 #     access_token = my_access_token
 #     api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
