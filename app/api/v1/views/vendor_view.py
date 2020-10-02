@@ -18,7 +18,6 @@ from app.api.v1.utils.users_validator import UserValidator
 v1 = Blueprint('vendorv1', __name__, url_prefix='/api/v1')
 
 # endpoint to get all vendors
-
 # for key in cache.keys(): cache.delete(key)
 @v1.route("/vendors", methods=['GET'])
 def get():
@@ -162,7 +161,7 @@ def logout(vendorId):
         return jsonify({"msg": "Forbidden request!"}), 403
     else:
         jti = get_raw_jwt()['jti']
-        
+
         revoked_store.set(jti, 'true', ACCESS_EXPIRES * 1.2)
         return jsonify({"msg": "You've been successully logged out!"}), 200
 

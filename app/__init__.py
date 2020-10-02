@@ -10,6 +10,7 @@ from itsdangerous import (
 
 from app.database import Initialize_DB
 from flask_mpesa import MpesaAPI
+from instance.config import app_config
 from config.development import DATABASE_URI
 
 def create_app(config_name):
@@ -26,7 +27,9 @@ def create_app(config_name):
     app.config.from_object('config.development')
 
     # Load the configuration from the instance folder
-
+    app.config.from_object(app_config[config_name])
+    app.config.from_pyfile('config.py')
+    
     # Load configurations specified by the APP_CONFIG_FILE environment variable
     # Variables contained here will override those in the default configuration
     # export APP_CONFIG_FILE=/path/to/config/production.py
@@ -43,12 +46,14 @@ def create_app(config_name):
     from app.api.v1.views.user_view import v1 as user_v1
     from app.api.v1.views.product_view import v1 as product_v1
     from app.api.v1.views.vendor_view import v1 as vendor_v1
+    from app.api.v1.views.review_view import v1 as review_v1
     from app.api.v1.views.order_view import v1 as order_v1
 
     # Register blueprints
     app.register_blueprint(user_v1)
     app.register_blueprint(product_v1)
     app.register_blueprint(vendor_v1)
+    app.register_blueprint(review_v1)
     app.register_blueprint(order_v1)
 
     # init Flask-Mail
@@ -56,7 +61,7 @@ def create_app(config_name):
     SECURITY_PASSWORD_SALT = app.config['SECURITY_PASSWORD_SALT']
     SECRET_KEY = app.config['SECRET_KEY']
     serializer = URLSafeTimedSerializer(SECRET_KEY)
-
+    
     # instantiate mpesa
     mpesaapi= MpesaAPI()
 

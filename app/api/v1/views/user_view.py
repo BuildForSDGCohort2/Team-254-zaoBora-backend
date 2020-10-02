@@ -272,7 +272,7 @@ def logout(userEmail):
         return jsonify({"msg": "You've been successully logged out!"}), 200
 
 
-# Endpoint for revoking the current users refresh token
+# endpoint for revoking the current users refresh token
 @v1.route('/auth/refresh_revoke/<string:userEmail>', methods=['DELETE'])
 @jwt_refresh_token_required
 def logout2(userEmail):
