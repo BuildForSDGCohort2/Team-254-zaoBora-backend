@@ -9,7 +9,7 @@ from app.api.v1.models.vendor_model import Vendor
 from app.api.v1.models.order_model import Order
 
 
-v1 = Blueprint('paymentv1', __name__, url_prefix='/api/v1')
+v1 = Blueprint('ordersv1', __name__, url_prefix='/api/v1')
 valid_order_status = ['pending', 'confirmed', 'shipping', 'cancelled', 'delivered']
 
 # Lipa na mpesa route

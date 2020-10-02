@@ -50,6 +50,7 @@ class Order(BaseModel):
             "status": f"status = '{updates['status']}'",
         }
         
+        
         pairs = ", ".join(pairs_dict.values())
         order = self.fetch('id', f"tracking_id = '{tracking_id}'")
 

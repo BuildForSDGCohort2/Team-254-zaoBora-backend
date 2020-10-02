@@ -124,12 +124,12 @@ class Initialize_DB:
                 id serial PRIMARY KEY NOT NULL,
                 customer_id INT REFERENCES users(id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
-                order_id INT REFERENCES orders(id)\
+                tracking_id CHAR(100) REFERENCES orders(tracking_id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 discount INT DEFAULT 0,
                 delivery_fee INT DEFAULT 0,
-                subtotal INTEGER NOT NULL,
-                total INTEGER NOT NULL,
+                subtotal INT DEFAULT 0,
+                total INT DEFAULT 0,
                 created_on TIMESTAMP DEFAULT current_timestamp,
                 updated_on TIMESTAMP DEFAULT current_timestamp
             );
