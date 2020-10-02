@@ -5,7 +5,7 @@ import re
 import json
 import requests
 from flask import (
-    jsonify, request, abort, make_response, json, Blueprint, render_template_string, url_for)
+    jsonify, request, abort, make_response, json, Blueprint, render_template_string, url_for, redirect)
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
@@ -25,6 +25,8 @@ from app.api.v1.utils.email import send_email, confirm_verification_token, gener
 
 v1 = Blueprint('userv1', __name__, url_prefix='/api/v1')
 serializer = URLSafeTimedSerializer(SECRET_KEY)
+DEV_BASE_URL = 'http://localhost:8080/#/'
+BASE_URL = 'https://buildforsdgcohort2.github.io/Team-254-zaoBora-frontend/#/'
 
 # for key in cache.keys(): cache.delete(key)
 
@@ -33,7 +35,6 @@ serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 @v1.route("/users", methods=['GET'])
 def get():
-    print('---> ', current_app)
     users = User().fetch_all_users()
     users_list = []
 
@@ -164,6 +165,7 @@ def registration():
         return jsonify(send_mail_res), send_mail_res['status']
 
 
+# Confirm email endpoint
 @v1.route('/confirm-email/<token>')
 def confirm_email(token):
     email = confirm_verification_token(token)
@@ -186,12 +188,51 @@ def confirm_email(token):
                 "error": "Error fetching email"
             }), 422
         else:
-            User().verify_email(email, 'users')
-            return jsonify({
-                "msg": "Email verified successfully"
-            }), 200
+            verify = User().verify_email(email, 'users')
+            try:
+                verify == 'verified'
+                return redirect(f"{DEV_BASE_URL}email-verified", code=302)
+            except:
+                return jsonify({
+                    "error": "Email verification failed"
+                }), 400
     else:
         return jsonify(email), email['status']
+
+
+# Resend email endpoint
+@v1.route('/<string:acc_type>/resend-email', methods=['POST'])
+@jwt_required
+def resend_email(acc_type):
+    auth_user_email = get_jwt_identity()
+    data = request.get_json()
+    email = data['email']
+    users = acc_type == "users"
+    vendors = acc_type == "vendors"
+
+    dup_email = User().fetch_specific_user(
+        'email',
+        f"email = '{email}'",
+        acc_type
+    )
+
+    if (not dup_email) or (email == auth_user_email):
+        try:
+            users or vendors
+            token = generate_verification_token(email)
+            verification_email = url_for(
+                'userv1.confirm_email', token=token, _external=True)
+            send_mail_res = send_email(email, {}, verification_email)
+        except:
+            return jsonify({
+                "error": "Error processing request"    
+            }), 400
+    else:
+        return jsonify({
+            "error": "This email already exists"
+        }), 422
+
+    return jsonify(send_mail_res), send_mail_res['status']
 
 
 # The jwt_refresh_token_required decorator insures a valid refresh
@@ -200,7 +241,7 @@ def confirm_email(token):
 # the refresh token, and use the create_access_token() function again
 # to make a new access token for this identity.
 
-
+# Refresh token endpoint
 @v1.route('/refresh', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():

@@ -44,12 +44,18 @@ def create_app(config_name):
     from app.api.v1.views.product_view import v1 as product_v1
     from app.api.v1.views.vendor_view import v1 as vendor_v1
     from app.api.v1.views.order_view import v1 as order_v1
+    from app.api.v1.views.cart_view import v1 as cart_v1
+    from app.api.v1.views.review_view import v1 as review_v1
+    from app.api.v1.views.receipt_view import v1 as receipt_v1
 
     # Register blueprints
     app.register_blueprint(user_v1)
     app.register_blueprint(product_v1)
     app.register_blueprint(vendor_v1)
     app.register_blueprint(order_v1)
+    app.register_blueprint(review_v1)
+    app.register_blueprint(cart_v1)
+    app.register_blueprint(receipt_v1)
 
     # init Flask-Mail
     mail.init_app(app)
@@ -97,39 +103,5 @@ def create_app(config_name):
         # handler for error 405
 
         return jsonify({'status': 405, 'message': 'Method not allowed'}), 405
-
-    # # Send email
-    # @app.route("/api/v1/verify-email", methods=['POST'])
-    # def verify_email():
-    #     try:
-    #         data = request.get_json()
-    #         email = data['email']
-    #         token = serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
-    #         msg = Message("Please confirm your email",
-    #                     sender="zaobora@gmail.com",
-    #                     recipients=[email])
-    #         link = url_for('confirm_email', token=token, _external=True)
-            
-    #         msg.body = 'Follow this link {}'.format(link)
-    #         mail.send(msg)
-    #         return jsonify({
-    #             "msg": "Email sent successfully"
-    #         }), 200
-    #     except:
-    #         return jsonify({
-    #             "error": "unable to send email"
-    #         }), 400
-
-    # # Verify email
-    # @app.route('/api/v1/confirm_email/<token>')
-    # def confirm_email(token):
-    #     try:
-    #         email = serializer.loads(token, salt=SECURITY_PASSWORD_SALT, max_age=3600)
-
-    #         return jsonify({ "msg": "Email sent successfully" }), 200
-    #     except SignatureExpired:
-    #         return jsonify({ "error": "The token has expired!" }), 403
-    #     except BadTimeSignature:
-    #         return jsonify({ "error": "The token is invalid!" }), 403
 
     return app

@@ -91,7 +91,9 @@ class Initialize_DB:
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 quantity INTEGER NOT NULL,
                 unit_price INTEGER NOT NULL,
-                total INTEGER NOT NULL
+                total INTEGER NOT NULL,
+                created_on TIMESTAMP DEFAULT current_timestamp,
+                updated_on TIMESTAMP DEFAULT current_timestamp
             );
 
             CREATE TABLE IF NOT EXISTS reviews (
@@ -111,8 +113,8 @@ class Initialize_DB:
                 customer_id INT REFERENCES users(id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 tracking_id CHAR(100) UNIQUE NOT NULL,
-                items TEXT[] NOT NULL,
-                status CHAR(20) NULL,
+                items TEXT NOT NULL,
+                status CHAR(20) DEFAULT 'pending' NOT NULL,
                 total INTEGER NOT NULL,
                 created_on TIMESTAMP DEFAULT current_timestamp,
                 updated_on TIMESTAMP DEFAULT current_timestamp
@@ -122,13 +124,14 @@ class Initialize_DB:
                 id serial PRIMARY KEY NOT NULL,
                 customer_id INT REFERENCES users(id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
-                order_id INT REFERENCES orders(id)\
+                tracking_id CHAR(100) REFERENCES orders(tracking_id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 discount INT DEFAULT 0,
                 delivery_fee INT DEFAULT 0,
-                subtotal INTEGER NOT NULL,
-                total INTEGER NOT NULL,
-                created_on TIMESTAMP DEFAULT current_timestamp
+                subtotal INT DEFAULT 0,
+                total INT DEFAULT 0,
+                created_on TIMESTAMP DEFAULT current_timestamp,
+                updated_on TIMESTAMP DEFAULT current_timestamp
             );
             """
         )

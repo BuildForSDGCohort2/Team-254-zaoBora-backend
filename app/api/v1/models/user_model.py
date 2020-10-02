@@ -157,7 +157,8 @@ class User(BaseModel):
         pairs = "email_confirmed = true"
 
         if self.fetch_specific_user('email', f"email = '{email}'", account):
-            return self.base_model.update_item(pairs, f"email = '{email}'", account)
+            self.base_model.update_item(pairs, f"email = '{email}'", account)
+            return 'verified'
         else:
             return {
                 "error": "User not found or does not exist!",
