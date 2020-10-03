@@ -59,6 +59,7 @@ def get():
 @v1.route("/fetch-active-user", methods=['GET'])
 @jwt_required
 def fetch_active_user():
+    revoked_store = User().redis_client
     try:
         active_user_email = get_jwt_identity()
         userDetails = User().fetch_specific_user(
@@ -81,7 +82,15 @@ def fetch_active_user():
 
         access_token = create_access_token(identity=active_user_email)
         refresh_token = create_refresh_token(identity=active_user_email)
-        print(user)
+        access_jti = get_jti(encoded_token=access_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)
+
+        print('---------')
+        try:
+            revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
+            revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+        except Exception as e:
+            print('--> ',e)
 
         return jsonify({
             'user': user,
