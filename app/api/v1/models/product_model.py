@@ -1,4 +1,3 @@
-from flask import jsonify
 from app.api.v1.models.base_model import BaseModel
 
 
@@ -11,26 +10,28 @@ class Product(BaseModel):
         self.base_model.table_name = 'products'
         
         if product:
-            self.pname = product['product_name']
+            self.product_name = product['product_name']
+            self.product_id = product['product_id']
             self.description = product['description']
             self.quantity = product['quantity']
-            self.rprice = product['regular_price']
-            self.dprice = product['discounted_price']
-            self.prating = product['product_rating']
-            self.preview = product['mass']
+            self.regular_price = product['regular_price']
+            self.discounted_price = product['discounted_price']
+            self.product_rating = product['product_rating']
+            self.mass = product['mass']
             self.vendor_id = product['vendor_id']
     
     def save_product(self):
         # func to save a non-existing product / new product
         
         product = dict(
-            product_name=self.pname,
+            product_name=self.product_name,
+            product_id=self.product_id,
             description=self.description,
             quantity=self.quantity,
-            regular_price=self.rprice,
-            discounted_price=self.dprice,
-            product_rating=self.prating,
-            product_review=self.preview,
+            regular_price=self.regular_price,
+            discounted_price=self.discounted_price,
+            product_rating=self.product_rating,
+            mass=self.mass,
             vendor_id=self.vendor_id
         ) 
         
@@ -38,14 +39,6 @@ class Product(BaseModel):
         values = tuple(product.values())
         
         return self.base_model.add_item(keys, values)
-            
-    def  fetch_product_id(self, product_name):
-         # fetches a product id 
-          
-         try:
-             return self.fetch_specific_product('id', f"product_name = '{product_name}'", 'products')
-         except:
-             return False
     
     def fetch_all_products(self, fields, condition, name):
         # fetches all products
@@ -57,33 +50,34 @@ class Product(BaseModel):
         
         return self.base_model.grab_items_by_name(cols, condition, name)
     
-    def update_product(self, id, updates):
+    def update_product(self, product_id, updates):
         # updates a product
         
         pairs_dict = {
             "product_name": f"product_name = '{updates['product_name']}'", 
             "description": f"description = '{updates['description']}'", 
             "quantity": f"quantity = '{updates['quantity']}'", 
-            "regular_price": f"regular_price = '{updates['regular_price']}'", 
-            "discounted_price": f"discounted_price = '{updates['discounted_price']}'"     
+            "regular_price": f"regular_price = '{updates['regular_price']}'",
+            "discounted_price": f"discounted_price = '{updates['discounted_price']}'",
+            "product_rating": f"product_rating = '{updates['product_rating']}'",
+            "mass": f"mass = '{updates['mass']}'"
         }
         
         pairs = ", ".join(pairs_dict.values())
         
-        if self.fetch_specific_product('id', f"id = {id}", 'products'):
-            return self.base_model.update_item(pairs, f"id = {id}", 'products')
-        else:
-            return jsonify({
-                "error": "Product not found or does not exist!",
-                "status": 404
-            }), 404
+        return self.base_model.update_item(pairs, f"product_id = '{product_id}'", 'products')
             
-    def delete_product(self, id):
-        # defines the delete query
+    def delete_product(self, product_id):
+        # defines the delete product query
         
-        if self.fetch_specific_product('id', f"id = {id}", 'products'):
-            return self.base_model.delete_item(f"id = {id}", 'products')
-        else:
-            return {
-                "error": "Product not found or does not exist!"
-            }
+        return self.base_model.delete_item(f"product_id = '{product_id}'", 'products')
+
+    def rate_product(self, product_id, rating):
+        
+        pairs_dict = {
+            "product_rating": f"product_rating = '{rating}'"
+        }
+        
+        updates = ", ".join(pairs_dict.values())
+        
+        return self.base_model.update_item(updates, f"product_id = '{product_id}'", 'products')
