@@ -73,6 +73,7 @@ class Initialize_DB:
                 vendor_id INT REFERENCES vendors(id)\
                 ON UPDATE CASCADE ON DELETE CASCADE,
                 product_name TEXT NOT NULL,
+                product_id CHAR(50) UNIQUE NOT NULL,
                 description TEXT NOT NULL,
                 quantity INTEGER NOT NULL,
                 regular_price INTEGER NOT NULL,
