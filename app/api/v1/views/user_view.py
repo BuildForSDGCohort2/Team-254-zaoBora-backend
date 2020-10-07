@@ -56,13 +56,25 @@ def get():
 
 
 # Fetch active user
-@v1.route("/fetch-active-user", methods=['GET'])
+@v1.route("/<string:account>/active", methods=['GET'])
 @jwt_required
-def fetch_active_user():
-    revoked_store = User().redis_client
+def fetch_active_user(account):
+    accounts = ['user', 'vendor']
+
+    if not account in accounts:
+        return jsonify({
+            "error": "Invalid account type! (user/vendor)"    
+        }), 422
+
+    account_type = User() if account == 'user' else Vendor()
+    revoked_store = account_type.redis_client
     try:
         active_user_email = get_jwt_identity()
-        userDetails = User().fetch_specific_user(
+        userDetails = account_type.fetch_specific_user(
+            'first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer',
+            f"email = '{active_user_email}'",
+            'users'
+        ) if account == 'user' else account_type.fetch_specific_vendor(
             'first_name, last_name, username, phone_number, email, city, region, address, street_address, is_farmer',
             f"email = '{active_user_email}'",
             'users'
@@ -96,10 +108,11 @@ def fetch_active_user():
             'user': user,
             'authenticated': True,
             'access_token': access_token,
-            'refresh_token': refresh_token
+            'refresh_token': refresh_token,
+            'account': account
         }), 200
     except:
-        return jsonify({'msg': 'User not found!'}), 404
+        return jsonify({'msg': f'{account} not found!'}), 404
 
 
 # endpoint to register/sign up new users
