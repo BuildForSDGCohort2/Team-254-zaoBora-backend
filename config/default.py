@@ -9,3 +9,4 @@ MAIL_USE_SSL = os.getenv('MAIL_USE_SSL')
 MAIL_USE_TLS = os.getenv('MAIL_USE_TLS')
 CORS_HEADERS = "Content-Type"
 CORS_RESOURCES = {r"/api/*": {"origins": "*"}}
+CORS_SUPPORTS_CREDENTIALS = True
