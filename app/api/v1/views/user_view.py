@@ -15,6 +15,7 @@ from flask_mail import Message
 from itsdangerous import (
     URLSafeTimedSerializer, SignatureExpired, BadTimeSignature)
 from flask import current_app
+from flask_cors import cross_origin
 
 from config.development import (
     ACCESS_EXPIRES, REFRESH_EXPIRES, SECURITY_PASSWORD_SALT, SECRET_KEY)
@@ -286,6 +287,7 @@ def protected():
 
 # allows registered users to login
 @v1.route("/auth/login", methods=['POST'])
+@cross_origin(origin='*')
 def login():
     data = request.get_json()
     missing_fields = UserValidator().login_fields(data)
