@@ -287,7 +287,6 @@ def protected():
 
 # allows registered users to login
 @v1.route("/auth/login", methods=['POST'])
-@cross_origin(origin='*')
 def login():
     data = request.get_json()
     missing_fields = UserValidator().login_fields(data)
@@ -314,7 +313,7 @@ def login():
     refresh_token = create_refresh_token(identity=credentials['email'])
 
     try:
-        user['status']
+        'status' in user
         return make_response(jsonify(user), user['status'])
     except:
         email = user['email']
