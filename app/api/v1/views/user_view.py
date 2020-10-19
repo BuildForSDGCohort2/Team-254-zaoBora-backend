@@ -315,6 +315,7 @@ def login():
     if 'status' in user:
         return make_response(jsonify(user), user['status'])
     else:
+        print('>>>>>> ',user)
         email = user['email']
         access_jti = get_jti(encoded_token=access_token)
         refresh_jti = get_jti(encoded_token=refresh_token)
