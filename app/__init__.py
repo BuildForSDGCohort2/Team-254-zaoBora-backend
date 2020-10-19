@@ -17,17 +17,15 @@ def create_app(config_name):
 
     # init app
     app = Flask(__name__, instance_relative_config=True)
-    
-    # Cors settings
-    app.config['CORS_HEADERS'] = "Content-Type"
-    app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
-    CORS(app)
 
     # Load the default configuration
     app.config.from_object('config.default')
 
     # Load the development configuration
     app.config.from_object('config.development')
+    
+    # Cors
+    CORS(app)
 
     # Load the configuration from the instance folder
 
