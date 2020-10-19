@@ -319,6 +319,12 @@ def login():
         email = user['email']
         access_jti = get_jti(encoded_token=access_token)
         refresh_jti = get_jti(encoded_token=refresh_token)
+        print('------------------------------------------------')
+        print('access_jti: ',access_token)
+        print('access_jti: ',refresh_token)
+        print('access_jti: ',access_jti)
+        print('refresh_jti: ',refresh_jti)
+        print('------------------------------------------------')
 
         revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
         revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
