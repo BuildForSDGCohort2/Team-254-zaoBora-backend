@@ -312,10 +312,9 @@ def login():
     access_token = create_access_token(identity=credentials['email'])
     refresh_token = create_refresh_token(identity=credentials['email'])
 
-    try:
-        'status' in user
+    if 'status' in user:
         return make_response(jsonify(user), user['status'])
-    except:
+    else:
         email = user['email']
         access_jti = get_jti(encoded_token=access_token)
         refresh_jti = get_jti(encoded_token=refresh_token)
