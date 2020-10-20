@@ -85,7 +85,7 @@ def create_app(config_name):
     # Check if token is blacklisted
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):
-        revoked_store = redis_client
+        revoked_store = redis_store
         jti = decrypted_token['jti']
         entry = revoked_store.get(jti)
 
