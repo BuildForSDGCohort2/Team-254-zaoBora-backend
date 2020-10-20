@@ -23,6 +23,7 @@ def create_app(config_name):
 
     # Load the development configuration
     app.config.from_object('config.development')
+    print('===> REDIS_URL: ',app.config['REDIS_URL'])
     
     # Cors
     CORS(app)
