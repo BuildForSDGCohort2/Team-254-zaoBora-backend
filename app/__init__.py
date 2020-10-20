@@ -18,7 +18,6 @@ def create_app(config_name):
 
     # init app
     app = Flask(__name__, instance_relative_config=True)
-    app.config['CORS_ORIGINS'] = ['https://zaobora-frontend.herokuapp.com/']
     
     # Cors
     CORS(app)

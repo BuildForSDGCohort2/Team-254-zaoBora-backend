@@ -10,4 +10,3 @@ MAIL_USE_TLS = os.getenv('MAIL_USE_TLS')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_PASS = os.getenv('REDIS_PASS')
 REDIS_HOST = os.getenv('REDIS_HOST')
-CORS_HEADERS = 'Content-Type'
