@@ -26,7 +26,7 @@ def create_app(config_name):
     app.config.from_object('config.development')
     
     # Cors
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Load the configuration from the instance folder
 
