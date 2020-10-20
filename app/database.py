@@ -1,6 +1,7 @@
 import os
 import psycopg2
 
+
 class Initialize_DB:
 
     @classmethod
@@ -14,14 +15,18 @@ class Initialize_DB:
         try:
             cls.connection = psycopg2.connect(db_url)
             cls.cursor = cls.connection.cursor()
-            print(f'A connection to {db_url} database was established!')
+            print(f'===> A connection to {db_url} database was established!')
         except:
-            print(f'A problem occured while connecting to {db_url}')
+            print(f'===> A problem occured while connecting to {db_url}')
 
     @classmethod
     def init_redis(cls, redis_client):
         # Initialize redis_client
-        cls.redis_client = redis_client
+        try:
+            cls.redis_client = redis_client
+            print('===> Successfully connected to redis')
+        except Exception as e:
+            print(f'===> A problem occured while connecting to redis {e}')
 
     @classmethod
     def init_mail(cls, mail):
