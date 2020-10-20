@@ -329,6 +329,7 @@ def login():
 
         revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
         revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+        print('================================================')
 
         if not user['email_confirmed']:    
             token = generate_verification_token(email)
