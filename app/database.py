@@ -20,11 +20,11 @@ class Initialize_DB:
             print(f'===> A problem occured while connecting to {db_url}')
 
     @classmethod
-    def init_redis(cls, redis_client):
+    def init_redis(cls, redis_store):
         # Initialize redis_client
         try:
-            cls.redis_client = redis_client
-            print('===> Successfully connected to redis')
+            cls.redis_client = redis_store
+            print(f'===> Successfully connected to redis {cls.redis_client}')
         except Exception as e:
             print(f'===> A problem occured while connecting to redis {e}')
 

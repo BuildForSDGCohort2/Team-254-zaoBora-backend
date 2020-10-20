@@ -1,4 +1,5 @@
 import os
+import redis
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager)
@@ -23,7 +24,6 @@ def create_app(config_name):
 
     # Load the development configuration
     app.config.from_object('config.development')
-    print('===> REDIS_URL: ',app.config['REDIS_URL'])
     
     # Cors
     CORS(app)
@@ -39,8 +39,14 @@ def create_app(config_name):
     jwt.init_app(app)
 
     # init Cache
-    redis_client = FlaskRedis(app)
-    redis_client.init_app(app)
+    redis_store = redis.StrictRedis(
+        host=app.config['REDIS_HOST'],
+        port=app.config['REDIS_PORT'],
+        db=0,
+        password=app.config['REDIS_PASS'],
+        connection_pool=None,
+        decode_responses=True
+    )
 
     # v1 Blueprints
     from app.api.v1.views.user_view import v1 as user_v1
@@ -71,7 +77,7 @@ def create_app(config_name):
     
     # init db
     db = Initialize_DB(app)
-    db.init_redis(redis_client)
+    db.init_redis(redis_store)
     db.init_db(DATABASE_URI)
     db.create_tables()
     db.connection.commit
