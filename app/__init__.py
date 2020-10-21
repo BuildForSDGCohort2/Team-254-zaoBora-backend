@@ -18,12 +18,12 @@ def create_app(config_name):
 
     # init app
     app = Flask(__name__, instance_relative_config=True)
-    
-    # Cors
-    CORS(app, resources={r"/api/*": {"origins": "https://zaobora-frontend.herokuapp.com/"}})
 
     # Load the default configuration
     app.config.from_object('config.default')
+    
+    # Cors
+    CORS(app, resources={r"/api/*": {"origins": "https://zaobora-frontend.herokuapp.com/"}})
 
     # Load the development configuration
     app.config.from_object('config.development')
