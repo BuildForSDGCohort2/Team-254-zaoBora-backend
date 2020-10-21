@@ -18,12 +18,9 @@ def create_app(config_name):
 
     # init app
     app = Flask(__name__, instance_relative_config=True)
-
+    
     # Load the default configuration
     app.config.from_object('config.default')
-    
-    # Cors
-    CORS(app, resources={r"/api/*": {"origins": "https://zaobora-frontend.herokuapp.com/"}})
 
     # Load the development configuration
     app.config.from_object('config.development')
@@ -92,6 +89,14 @@ def create_app(config_name):
         if entry is None:
             return True
         return entry == 'true'
+    
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', 'https://zaobora-frontend.herokuapp.com/')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
 
     @app.route('/')
     @app.route('/index')
