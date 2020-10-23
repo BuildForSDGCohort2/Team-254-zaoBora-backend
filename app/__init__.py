@@ -92,10 +92,18 @@ def create_app(config_name):
     
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Origin', 'https://zaobora-frontend.herokuapp.com')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        print('request: ',request)
+        print('referrer: ',request.referrer)
+        url = request.referrer[:-1]
+        print('url: ',url)
+        white_list = ['https://zaobora-frontend.herokuapp.com', 'http://localhost:8080']
+
+        if url in white_list:
+            response.headers.add('Access-Control-Allow-Origin', url)
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+
         return response
 
     @app.route('/')
