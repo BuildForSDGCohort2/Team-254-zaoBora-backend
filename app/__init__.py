@@ -96,7 +96,7 @@ def create_app(config_name):
         print('referrer: ',request.referrer)
         url = request.referrer[:-1]
         print('url: ',url)
-        white_list = ['https://zaobora-frontend.herokuapp.com', 'http://localhost:8080']
+        white_list = ['https://zaobora-frontend.herokuapp.com', 'http://localhost:8080', 'http://zaobora-frontend.herokuapp.com']
 
         if url in white_list:
             response.headers.add('Access-Control-Allow-Origin', url)
