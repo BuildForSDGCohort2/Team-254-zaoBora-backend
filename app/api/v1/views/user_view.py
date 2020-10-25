@@ -289,6 +289,8 @@ def protected():
 @v1.route("/auth/login", methods=['POST'])
 def login():
     data = request.get_json()
+    print('------------------------------------------------')
+    print('----> ',data)
     missing_fields = UserValidator().login_fields(data)
     revoked_store = User().redis_client
 
