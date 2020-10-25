@@ -104,6 +104,7 @@ def create_app(config_name):
             response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
             response.headers.add('Access-Control-Allow-Credentials', 'true')
 
+        print('===> ',response)
         return response
 
     @app.route('/')
