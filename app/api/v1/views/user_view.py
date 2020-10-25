@@ -311,6 +311,8 @@ def login():
     user = User().log_in_user(credentials)
     access_token = create_access_token(identity=credentials['email'])
     refresh_token = create_refresh_token(identity=credentials['email'])
+    print('------------------------------------------------')
+    print('----> ',user)
 
     if 'status' in user:
         return make_response(jsonify(user), user['status'])
